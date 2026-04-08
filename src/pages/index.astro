@@ -80,25 +80,23 @@ const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
       <h1 class="text-3xl font-medium sm:text-5xl">{title}</h1>
       <div class="flex flex-col items-center gap-3 sm:gap-6">
         <Authors authors={authors} />
-        <div class="text-sm text-zinc-600 sm:text-lg dark:text-zinc-400">
-          <sup>1</sup>Harvard University &nbsp;
-          <sup>2</sup>Salk Institute &nbsp;
-          <sup>3</sup>UC San Diego &nbsp;
-          <sup>4</sup>Mila AI Institute &nbsp;
-          <sup>5</sup>University of Montreal &nbsp;
-          <sup>6</sup>University of Washington &nbsp;
-          <sup>7</sup>eScience Institute &nbsp;
-          <sup>8</sup>Computational Neuroscience Center &nbsp;
-          <sup>9</sup>MIT &nbsp;
-          <sup>10</sup>Picower Institute &nbsp;
-          <sup>11</sup>Salk Institute for Biological Studies &nbsp;
-          <sup>12</sup>Imperial College London &nbsp;
-          <sup>13</sup>Brain and Cognitive Sciences &nbsp;
-          <sup>14</sup>School of Computer Science &nbsp;
-          <sup>15</sup>CIFAR &nbsp;
-          <sup>16</sup>Montreal Neurological Institute &nbsp;
-          <sup>*</sup>Equal contribution &nbsp;
-          <sup>&dagger;</sup>Equal advising
+        <div class="text-center text-sm text-zinc-600 dark:text-zinc-400">
+          <details class="inline-block cursor-pointer">
+            <summary class="list-none cursor-pointer hover:underline">
+              <span class="select-none">Affiliations</span>
+            </summary>
+            <div class="mt-2 text-left max-w-2xl mx-auto space-y-1">
+              <div><sup class="mr-1">1</sup><span>Computational Neurobiology Laboratory, Salk Institute for Biological Studies</span></div>
+              <div><sup class="mr-1">2</sup><span>Wu Tsai Neurosciences Institute, Stanford University</span></div>
+              <div><sup class="mr-1">2*</sup><span>Department of Statistics, Stanford University</span></div>
+              <div><sup class="mr-1">3</sup><span>Department of Neurosciences, UC San Diego</span></div>
+              <div><sup class="mr-1">3*</sup><span>Halıcıoğlu Data Science Institute, UC San Diego</span></div>
+              <div><sup class="mr-1">4</sup><span>Department of Organismic and Evolutionary Biology, Harvard University</span></div>
+              <div><sup class="mr-1">4*</sup><span>Department of Computer Science, Harvard University</span></div>
+              <div><sup class="mr-1">5</sup><span>Mila - Quebec Artificial Intelligence Institute</span></div>
+              <div><sup class="mr-1">6</sup><span>School of Computer Science, McGill University</span></div>
+            </div>
+          </details>
         </div>
         {conference && <div>{conference}</div>}
         {notes && <Notes notes={notes} />}

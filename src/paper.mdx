@@ -1,61 +1,26 @@
 ---
 title: "Code to Action: Motor Programs from Discrete Syllables in Whole-Body Biomechanical Control"
 authors:
-  - name: "Charles Y. Zhang"
-    notes: ["1", "*"]
-  - name: "Yuanjia Yang"
-    notes: ["2,3", "*"]
-  - name: "Aidan Sirbu"
-    notes: ["4,5"]
-  - name: "Elliott T.T. Abe"
-    notes: ["6,7,8"]
-  - name: "Emil Warnberg"
-    notes: ["1"]
-  - name: "Eric J. Leonardis"
-    notes: ["2"]
-  - name: "Diego E. Aldarondo"
-    notes: ["1"]
-  - name: "Adam Lee"
-    notes: ["1,2"]
-  - name: "Aaditya Prasad"
-    notes: ["9,10"]
-  - name: "Jason Foat"
-    notes: ["2"]
   - name: "Kaiwen Bian"
-    notes: ["2"]
-  - name: "Joshua Park"
-    notes: ["2"]
-  - name: "Rusham Bhatt"
-    notes: ["2"]
-  - name: "Hutton Saunders"
-    notes: ["2"]
-  - name: "Akira Nagamori"
-    notes: ["11"]
-  - name: "Ayesha R. Thanawalla"
-    notes: ["11"]
-  - name: "Kee Wui Huang"
-    notes: ["11"]
-  - name: "Fabian Plum"
-    notes: ["12"]
-  - name: "Hendrik Beck"
-    notes: ["12"]
-  - name: "Steven W. Flavell"
-    notes: ["9,10,13"]
-  - name: "David Labonte"
-    notes: ["12"]
-  - name: "Blake A. Richards"
-    notes: ["4,5,14,15,16"]
-  - name: "Bingni W. Brunton"
-    notes: ["6,7,8"]
-  - name: "Eiman Azim"
-    notes: ["11,3"]
-  - name: "Bence P. Ölveczky"
-    notes: ["1", "\u2021", "\u00a7"]
-  - name: "Talmo D. Pereira"
-    notes: ["2", "\u2021", "\u00a7"]
+    notes: ["1,3*"]
+  - name: "Charles Y. Zhang"
+    notes: ["4*"]
+  - name: "Yuanjia Yang"
+    notes: ["1,3"]
+  - name: "Aidan Sirbu"
+    notes: ["5,6"]
   - name: "Aditi Jha"
+    notes: ["2,2*"]
   - name: "Kelly Buchanan"
+    notes: ["2,2*"]
+  - name: "Eric J. Leonardis"
+    notes: ["1"]
+  - name: "Bence P. Ölveczky"
+    notes: ["4"]
   - name: "Scott W. Linderman"
+    notes: ["2,2*"]
+  - name: "Talmo D. Pereira"
+    notes: ["1,3"]
 links:
   - name: Paper
     url: "#"
@@ -64,7 +29,7 @@ links:
     url: "#"
     icon: ri:image-line
   - name: Code
-    url: https://github.com/talmolab/track-mjx
+    url: https://github.com/talmolab/track-mjx/tree/kevin/kpms-decoder
     icon: ri:github-line
 theme: light
 favicon: favicon.svg
@@ -85,7 +50,7 @@ import displacementLow from "./assets/code_sequence_displacement_low.png";
 
 ## Abstract
 
-Naturalistic behavior is not independent actions, but a **sequence of switching motifs** each with their own dynamics. We introduce **Code2Act** (**C**ode-to-**A**ction), a Switching Nonlinear Dynamical System (S-NLDS) that uses [Keypoint-MoSeq](https://keypoint-moseq.readthedocs.io/) to segment behaviors into discrete syllables and produces motor control commands for each syllable. Code2Act preserves the internal dynamics of each discrete syllable, turning naturalistic behavior generation into a problem of **code sequencing** rather than repeated interaction with a physics engine. We demonstrate that code sequences are instructional and interpretable: specific code sequences (e.g., walking codes) produce behaviors that match expectations (e.g., more X-Y root displacement).
+Animals don't move by stringing together independent actions; they fluidly switch between behavioral motifs, each governed by its own dynamics. Premotor and basal ganglia circuits select which behavior to initiate and set its initial conditions, while the primary motor cortex evolves that behavior forward as a dynamical system. Yet computational approaches to modeling naturalistic behavior remain fragmented. While probabilistic state-space models (SSMs) can segment discrete behavioral syllables from keypoint data and reinforcement learning (RL) drives lower-level physics control, there exist no principled bridge between them. We introduce **Code2Act**, a **Switching Nonlinear Dynamical System (S-nLDS)** that unifies these levels within a single imitation framework. Built on observables from [MIMIC-MJX](https://arxiv.org/abs/2511.20532) (Zhang & Yang et al. 2025), a biomechanical simulation of naturalistic rodent behavior, our model replaces the linear regime dynamics of classical switching linear dynamical systems with a RNN trained in RL environment, capable of capturing the nonlinear, non-Gaussian structure of real motor control. The result is a system that jointly segments continuous behavior into discrete semantic units and generates long, biomechanically realistic motor sequences, closing the loop between behavioral understanding and motor generation in a way that mirrors the hierarchical dynamical organization of biological motor control.
 
 </HighlightedSection>
 
@@ -97,6 +62,13 @@ Naturalistic behavior is not independent actions, but a **sequence of switching 
 
 Current models capture what behavior looks like, but none can generate it with discrete syllable-level control.
 
+<Figure>
+  <Picture slot="figure" src={kpmsExample} alt="KPMS to action mapping example" />
+  <Fragment slot="caption">
+    **KPMS Code-to-Action Mapping.** Discrete syllable codes from Keypoint-MoSeq are mapped through the Code2Act decoder to produce continuous motor commands that drive whole-body biomechanical control.
+  </Fragment>
+</Figure>
+
 ## Pipeline Overview
 
 Code2Act uses a **prior distillation** pipeline where a pre-trained encoder-decoder VAE provides the action generation backbone, and a GRU-based RNN learns to predict the encoder's latent distribution from discrete syllable codes.
@@ -105,13 +77,6 @@ Code2Act uses a **prior distillation** pipeline where a pre-trained encoder-deco
   <Picture slot="figure" src={pipelineFig} alt="Code2Act prior distillation pipeline" />
   <Fragment slot="caption">
     **Code2Act Pipeline.** Keypoint-MoSeq segments reference trajectories into discrete syllable codes. A GRU-based RNN decoder takes (code embedding, proprioception) as input and produces hidden states. A unified VAE head maps the hidden state to a latent distribution (mu, sigma), from which z is sampled and fed through the pre-trained VAE decoder to produce motor commands. During training, a frozen pre-trained encoder provides KL alignment targets.
-  </Fragment>
-</Figure>
-
-<Figure>
-  <Picture slot="figure" src={kpmsExample} alt="KPMS to action mapping example" />
-  <Fragment slot="caption">
-    **KPMS Code-to-Action Mapping.** Discrete syllable codes from Keypoint-MoSeq are mapped through the Code2Act decoder to produce continuous motor commands that drive whole-body biomechanical control.
   </Fragment>
 </Figure>
 
@@ -170,19 +135,11 @@ Code2Act bridges the gap between probabilistic state space models (which capture
 @article{code2act2026,
   title={Code to Action: Motor Programs from Discrete Syllables
          in Whole-Body Biomechanical Control},
-  author={Zhang, Charles Y. and Yang, Yuanjia and Sirbu, Aidan
-          and Abe, Elliott T.T. and Warnberg, Emil
-          and Leonardis, Eric J. and Aldarondo, Diego E.
-          and Lee, Adam and Prasad, Aaditya and Foat, Jason
-          and Bian, Kaiwen and Park, Joshua and Bhatt, Rusham
-          and Saunders, Hutton and Nagamori, Akira
-          and Thanawalla, Ayesha R. and Huang, Kee Wui
-          and Plum, Fabian and Beck, Hendrik
-          and Flavell, Steven W. and Labonte, David
-          and Richards, Blake A. and Brunton, Bingni W.
-          and Azim, Eiman and {\"O}lveczky, Bence P.
-          and Pereira, Talmo D. and Jha, Aditi
-          and Buchanan, Kelly and Linderman, Scott W.},
+  author={Bian, Kaiwen and Zhang, Chanwoo and Yang, Yiyu
+          and Sirbu, Alexandra and Jha, Aditi
+          and Buchanan, Kelly and Leonardis, Eric J.
+          and {\"O}lveczky, Bence P. and Linderman, Scott W.
+          and Pereira, Talmo D.},
   journal={arXiv preprint},
   year={2026}
 }

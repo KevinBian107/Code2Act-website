@@ -13,11 +13,15 @@ const {
   autoplay = true,
   ...videoProps
 } = Astro.props;
+
+const baseUrl = import.meta.env.BASE_URL;
+const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+const resolvedSrc = src.startsWith("/") || src.startsWith("http") ? src : prefix + src;
 ---
 
 <video
   class="aspect-video h-auto w-full rounded-lg"
-  src={src}
+  src={resolvedSrc}
   controls={controls}
   loop={loop}
   playsinline={playsinline}
