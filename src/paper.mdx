@@ -1,0 +1,189 @@
+---
+title: "Code to Action: Motor Programs from Discrete Syllables in Whole-Body Biomechanical Control"
+authors:
+  - name: "Charles Y. Zhang"
+    notes: ["1", "*"]
+  - name: "Yuanjia Yang"
+    notes: ["2,3", "*"]
+  - name: "Aidan Sirbu"
+    notes: ["4,5"]
+  - name: "Elliott T.T. Abe"
+    notes: ["6,7,8"]
+  - name: "Emil Warnberg"
+    notes: ["1"]
+  - name: "Eric J. Leonardis"
+    notes: ["2"]
+  - name: "Diego E. Aldarondo"
+    notes: ["1"]
+  - name: "Adam Lee"
+    notes: ["1,2"]
+  - name: "Aaditya Prasad"
+    notes: ["9,10"]
+  - name: "Jason Foat"
+    notes: ["2"]
+  - name: "Kaiwen Bian"
+    notes: ["2"]
+  - name: "Joshua Park"
+    notes: ["2"]
+  - name: "Rusham Bhatt"
+    notes: ["2"]
+  - name: "Hutton Saunders"
+    notes: ["2"]
+  - name: "Akira Nagamori"
+    notes: ["11"]
+  - name: "Ayesha R. Thanawalla"
+    notes: ["11"]
+  - name: "Kee Wui Huang"
+    notes: ["11"]
+  - name: "Fabian Plum"
+    notes: ["12"]
+  - name: "Hendrik Beck"
+    notes: ["12"]
+  - name: "Steven W. Flavell"
+    notes: ["9,10,13"]
+  - name: "David Labonte"
+    notes: ["12"]
+  - name: "Blake A. Richards"
+    notes: ["4,5,14,15,16"]
+  - name: "Bingni W. Brunton"
+    notes: ["6,7,8"]
+  - name: "Eiman Azim"
+    notes: ["11,3"]
+  - name: "Bence P. Ölveczky"
+    notes: ["1", "\u2021", "\u00a7"]
+  - name: "Talmo D. Pereira"
+    notes: ["2", "\u2021", "\u00a7"]
+  - name: "Aditi Jha"
+  - name: "Kelly Buchanan"
+  - name: "Scott W. Linderman"
+links:
+  - name: Paper
+    url: "#"
+    icon: ri:file-pdf-2-line
+  - name: Poster
+    url: "#"
+    icon: ri:image-line
+  - name: Code
+    url: https://github.com/talmolab/track-mjx
+    icon: ri:github-line
+theme: light
+favicon: favicon.svg
+description: "Code to Action: Motor Programs from Discrete Syllables in Whole-Body Biomechanical Control"
+---
+
+import HighlightedSection from "./components/HighlightedSection.astro";
+import Figure from "./components/Figure.astro";
+import Picture from "./components/Picture.astro";
+import Video from "./components/Video.astro";
+import Wide from "./components/Wide.astro";
+import pipelineFig from "./assets/moseq_prior_distill_pipeline.png";
+import kpmsExample from "./assets/kpms_to_action_example.png";
+import trainingDecomp from "./assets/training_and_decomposition.png";
+import displacementLow from "./assets/code_sequence_displacement_low.png";
+
+<HighlightedSection>
+
+## Abstract
+
+Naturalistic behavior is not independent actions, but a **sequence of switching motifs** each with their own dynamics. We introduce **Code2Act** (**C**ode-to-**A**ction), a Switching Nonlinear Dynamical System (S-NLDS) that uses [Keypoint-MoSeq](https://keypoint-moseq.readthedocs.io/) to segment behaviors into discrete syllables and produces motor control commands for each syllable. Code2Act preserves the internal dynamics of each discrete syllable, turning naturalistic behavior generation into a problem of **code sequencing** rather than repeated interaction with a physics engine. We demonstrate that code sequences are instructional and interpretable: specific code sequences (e.g., walking codes) produce behaviors that match expectations (e.g., more X-Y root displacement).
+
+</HighlightedSection>
+
+## Problem Statement
+
+**Probabilistic State Space Models** (PSSMs) model the dynamics of the trajectories well. They model the switching and segmental behaviors, but they fail to serve as a generative model of trajectories.
+
+**Reinforcement Learning** (RL) are widely used for low-level motor control, but the learned latent of an end-to-end imitation model is not used for regeneration.
+
+Current models capture what behavior looks like, but none can generate it with discrete syllable-level control.
+
+## Pipeline Overview
+
+Code2Act uses a **prior distillation** pipeline where a pre-trained encoder-decoder VAE provides the action generation backbone, and a GRU-based RNN learns to predict the encoder's latent distribution from discrete syllable codes.
+
+<Figure>
+  <Picture slot="figure" src={pipelineFig} alt="Code2Act prior distillation pipeline" />
+  <Fragment slot="caption">
+    **Code2Act Pipeline.** Keypoint-MoSeq segments reference trajectories into discrete syllable codes. A GRU-based RNN decoder takes (code embedding, proprioception) as input and produces hidden states. A unified VAE head maps the hidden state to a latent distribution (mu, sigma), from which z is sampled and fed through the pre-trained VAE decoder to produce motor commands. During training, a frozen pre-trained encoder provides KL alignment targets.
+  </Fragment>
+</Figure>
+
+<Figure>
+  <Picture slot="figure" src={kpmsExample} alt="KPMS to action mapping example" />
+  <Fragment slot="caption">
+    **KPMS Code-to-Action Mapping.** Discrete syllable codes from Keypoint-MoSeq are mapped through the Code2Act decoder to produce continuous motor commands that drive whole-body biomechanical control.
+  </Fragment>
+</Figure>
+
+## Results
+
+### Training Performance and Reward Decomposition
+
+Code2Act achieves competitive imitation reward with the oracle VAE (Mimic-MJX) that has access to the full reference trajectory. The reward decomposition shows strong performance on coarse (root position/orientation) and fine (joint/end-effector) tracking.
+
+<Figure>
+  <Picture slot="figure" src={trainingDecomp} alt="Training curves and reward decomposition" />
+  <Fragment slot="caption">
+    **(A)** Training curves comparing RNN Distillation, RNN Concat Discrete (decoder-only), and RNN Concat Full architectures. **(B)** Reward decomposition: Code2Act (blue) vs. Mimic-MJX oracle (orange). Solid = coarse tracking (root), dashed = fine tracking (joints + end-effectors).
+  </Fragment>
+</Figure>
+
+### Behavior Instantiation
+
+Code sequences are **instructional**: providing walk codes produces walking behavior, groom codes produce grooming, and rear codes produce rearing. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
+
+<Video src="behavior_triptych_low.mp4" />
+
+**Walk Pose Instantiation.** K=6 trajectories per behavior (Groom | Walk | Rear), all initialized from a walk-like starting pose. Each colored body is an independent rollout driven by the same KPMS code sequence. The decoder produces behavior-appropriate dynamics for each syllable.
+
+### Code Sequence Displacement
+
+Code sequences produce **interpretable kinematics**: walk codes drive horizontal (X-Y) displacement while groom and rear codes produce minimal locomotion. Vertical (Z) displacement distinguishes rearing from other behaviors.
+
+<Figure>
+  <Picture slot="figure" src={displacementLow} alt="Code sequence displacement analysis" />
+  <Fragment slot="caption">
+    **Walk Pose Instantiation displacement.** Left: vertical displacement (Δz) from initial position. Right: horizontal displacement (Δxy). Walk codes (orange) produce large XY displacement; rear codes (green) show distinct Z dynamics; groom codes (blue) remain stationary. Mean ± SEM across surviving trajectories.
+  </Fragment>
+</Figure>
+
+### Generative Code Sequences
+
+Code2Act turns behavior generation into a **code sequencing** problem. We fit generative models (empirical transition matrix, HMM, ARHMM) to the KPMS code sequences and use them to generate novel code sequences. These generated sequences produce coherent free-loop behavior without any reference trajectory.
+
+<Video src="code_generation_triptych.mp4" />
+
+**Free-loop generation.** Novel code sequences sampled from learned generative models (Transition Matrix | HMM | ARHMM) produce coherent whole-body behavior. No reference trajectory is provided — the decoder autonomously translates the generated code sequence into motor commands.
+
+## Conclusion
+
+**Code2Act** preserves the internal dynamics of each discrete syllable, turning naturalistic behavior generation into a problem of **code sequencing** rather than repeated interaction with a physics engine.
+
+- **(1)** An engineering solution for **planning** naturalistic behavioral sequences without relying on physics.
+- **(2)** A generative modeling framework, akin to fitting an ARHMM, for synthesizing whole-body behavior.
+
+Code2Act bridges the gap between probabilistic state space models (which capture behavioral structure) and reinforcement learning (which produces motor control), by using discrete syllable codes as the interface between structure and action.
+
+## Citation
+
+```bibtex
+@article{code2act2026,
+  title={Code to Action: Motor Programs from Discrete Syllables
+         in Whole-Body Biomechanical Control},
+  author={Zhang, Charles Y. and Yang, Yuanjia and Sirbu, Aidan
+          and Abe, Elliott T.T. and Warnberg, Emil
+          and Leonardis, Eric J. and Aldarondo, Diego E.
+          and Lee, Adam and Prasad, Aaditya and Foat, Jason
+          and Bian, Kaiwen and Park, Joshua and Bhatt, Rusham
+          and Saunders, Hutton and Nagamori, Akira
+          and Thanawalla, Ayesha R. and Huang, Kee Wui
+          and Plum, Fabian and Beck, Hendrik
+          and Flavell, Steven W. and Labonte, David
+          and Richards, Blake A. and Brunton, Bingni W.
+          and Azim, Eiman and {\"O}lveczky, Bence P.
+          and Pereira, Talmo D. and Jha, Aditi
+          and Buchanan, Kelly and Linderman, Scott W.},
+  journal={arXiv preprint},
+  year={2026}
+}
+```
