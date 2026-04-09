@@ -47,6 +47,7 @@ import TwoColumns from "./components/TwoColumns.astro";
 import pipelineFig from "./assets/moseq_prior_distill_pipeline.png";
 import kpmsExample from "./assets/kpms_to_action_example.png";
 import trainingDecomp from "./assets/training_and_decomposition.png";
+import kidBarplot from "./assets/kid_barplot.png";
 import kinematicSigLow from "./assets/kinematic_signatures_low.png";
 import kinematicSigHigh from "./assets/kinematic_signatures_high.png";
 import displacementLow from "./assets/code_sequence_displacement_low.png";
@@ -105,6 +106,19 @@ Code2Act is not designed for trajectory tracking. Given the same KPMS code seque
     **(A)** Training curves comparing RNN Distillation, RNN Distillation + Decoder, RNN Concat Discrete, and RNN Concat Full architectures. **(B)** Reward decomposition on 250-frame generalization set: Code2Act (blue) vs. Mimic-MJX oracle (orange). Solid = coarse tracking (root), dashed = fine tracking (joints + end-effectors).
   </Fragment>
 </Figure>
+
+### Distribution Quality (KID)
+
+Tracking reward evaluates whether the decoder follows a *specific* reference trajectory, but the real question is whether Code2Act produces movements that are **distributionally correct** — does the overall repertoire of generated behavior look like real mouse motion? To answer this, we compute Kernel Inception Distance (KID): a VAE is trained on real mocap qpos trajectories to learn a feature space, and then KID measures the distributional gap between real and generated features using an unbiased MMD estimator. Lower KID means the generated motion distribution is closer to real.
+
+<Figure>
+  <Picture slot="figure" src={kidBarplot} alt="KID comparison across methods" />
+  <Fragment slot="caption">
+    **KID across conditions.** Split baseline (gray) is the noise floor from splitting real data. Mimic-MJX (oracle VAE with full trajectory access) and Code2Act (decoder with real KPMS codes) both produce motion close to real, while ARHMM-generated code sequences introduce additional distributional shift. All conditions are evaluated on 200-frame clips; error bars = std across 3 VAE seeds.
+  </Fragment>
+</Figure>
+
+This metric complements per-trajectory reward: while reward measures how well the decoder tracks individual clips, KID evaluates whether the *distribution* of movements — the range of speeds, postures, and joint configurations — matches real animal behavior. Notably, Code2Act with real codes (KID=1.84) achieves distribution quality comparable to the oracle Mimic-MJX (KID=1.81), suggesting that the discrete code interface preserves the statistical structure of natural behavior.
 
 ### Behavior Parade
 
