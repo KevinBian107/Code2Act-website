@@ -1,5 +1,5 @@
 ---
-title: "Code to Action: Motor Programs from Discrete Syllables in Whole-Body Biomechanical Control"
+title: "Code2Act"
 authors:
   - name: "Kaiwen Bian"
     notes: ["1,5"]
@@ -59,15 +59,21 @@ import triptychTrailLow from "./assets/behavior_triptych_trail_low.png";
 
 <HighlightedSection>
 
+<div class="!mt-0 !mb-8">
+<span class="text-xl sm:text-2xl font-normal text-zinc-700 dark:text-zinc-300 leading-relaxed">Code to Action: Motor Programs from Discrete Syllables in Whole-Body Biomechanical Control</span>
+</div>
+
 ## Abstract
 
 Animals don't move by stringing together independent actions; they fluidly switch between behavioral motifs, each governed by its own dynamics. Premotor and basal ganglia circuits select which behavior to initiate and set its initial conditions, while the primary motor cortex evolves that behavior forward as a dynamical system. Yet computational approaches to modeling naturalistic behavior remain fragmented. While probabilistic state-space models (SSMs) can segment discrete behavioral syllables from keypoint data and reinforcement learning (RL) drives lower-level physics control, there exist no principled bridge between them. We introduce **Code2Act**, a **Switching Nonlinear Dynamical System (S-nLDS)** that unifies these levels within a single imitation framework. Built on observables from [MIMIC-MJX](https://arxiv.org/abs/2511.20532) (Zhang & Yang et al. 2025), a biomechanical simulation of naturalistic rodent behavior, our model replaces the linear regime dynamics of classical switching linear dynamical systems with a RNN trained in RL environment, capable of capturing the nonlinear, non-Gaussian structure of real motor control. The result is a system that jointly segments continuous behavior into discrete semantic units and generates long, biomechanically realistic motor sequences, closing the loop between behavioral understanding and motor generation in a way that mirrors the hierarchical dynamical organization of biological motor control.
 
 </HighlightedSection>
 
-## Problem Statement
+## Motivation
 
-Probabilistic state space models (SSMs) capture the dynamics of behavioral trajectories well, segmenting switching and segmental behaviors into discrete syllables, but they fail to serve as generative models of physically realistic trajectories. Reinforcement learning (RL), on the other hand, is widely used for low-level motor control, yet the learned latent representations of end-to-end imitation models are typically unstructured and not reused for regeneration. Current approaches capture what behavior *looks like*, but none can generate it with discrete syllable-level control.
+Keypoint-MoSeq and similar probabilistic SSMs segment continuous behavior into discrete syllables, fine-grained motifs that may not be interpretable alone, but whose sequences paint a coarser picture from which coherent, identifiable behavior emerges. Yet these models operate on keypoint dynamics: they describe *what* behavior looks like, not how it is physically produced, and cannot serve as generative models of biomechanically realistic trajectories. Reinforcement learning, on the other hand, excels at physics-based motor control, yet the latent representations learned by end-to-end imitation policies are typically unstructured, entangled, and not reusable for structured behavioral generation.
+
+Code2Act bridges this gap by treating discrete syllable codes as the interface between behavioral segmentation and embodied motor control.
 
 <Figure>
   <Picture slot="figure" src={kpmsExample} alt="KPMS to action mapping example" />
@@ -78,7 +84,7 @@ Probabilistic state space models (SSMs) capture the dynamics of behavioral traje
 
 ## Pipeline Overview
 
-Code2Act uses a **prior distillation** pipeline where a pre-trained encoder-decoder VAE provides the action generation backbone, and a GRU-based RNN learns to predict the encoder's latent distribution from discrete syllable codes.
+Code2Act follows a **prior distillation** architecture. First, MIMIC-MJX trains an encoder-decoder VAE policy to imitate naturalistic rodent trajectories from inverse kinematics, producing motor commands for a biomechanical rodent body in MuJoCo MJX.
 
 <Figure>
   <Picture slot="figure" src={mimicTraining} alt="MIMIC-MJX training pipeline" />
@@ -87,18 +93,20 @@ Code2Act uses a **prior distillation** pipeline where a pre-trained encoder-deco
   </Fragment>
 </Figure>
 
+Code2Act then distills this pretrained encoder into a code-conditioned controller. Keypoint-MoSeq segments reference trajectories into discrete syllable codes. A GRU-based RNN decoder takes syllable code embeddings and proprioceptive feedback as input, producing hidden states that a unified VAE head maps to the pretrained encoder's latent space. The pretrained decoder translates these latent samples into motor commands. During training, a frozen encoder provides KL alignment targets, ensuring the RNN learns to reproduce the encoder's latent dynamics from syllable codes alone.
+
 <Figure>
   <Picture slot="figure" src={code2actPipeline} alt="Code2Act prior distillation pipeline" />
   <Fragment slot="caption">
-    **Code2Act Pipeline.** Keypoint-MoSeq segments reference trajectories into discrete syllable codes. A GRU-based RNN decoder takes (code embedding, proprioception) as input and produces hidden states. A unified VAE head maps the hidden state to a latent distribution (mu, sigma), from which z is sampled and fed through the pre-trained VAE decoder to produce motor commands. During training, a frozen pre-trained encoder provides KL alignment targets.
+    **Code2Act Pipeline.** Keypoint-MoSeq segments reference trajectories into discrete syllable codes. A GRU-based RNN decoder takes (code embedding, proprioception) as input and produces hidden states. A unified VAE head maps the hidden state to a latent distribution (&mu;, &sigma;), from which z is sampled and fed through the pre-trained VAE decoder to produce motor commands. During training, a frozen pre-trained encoder provides KL alignment targets.
   </Fragment>
 </Figure>
 
 ## Results
 
-### Training Performance and Reward Decomposition
+### Imitation from Coarse Syllable Codes
 
-Code2Act is not designed for trajectory tracking. Given the same KPMS code sequence, the real trajectory could unfold in thousands of different ways. Instead, tracking reward serves as a proxy for learning the **internal dynamics** of each behavioral syllable. Code2Act achieves competitive imitation reward with the oracle VAE (Mimic-MJX) that has access to the full reference trajectory, indicating that the discrete code interface retains enough information to recover the underlying motor programs.
+Code2Act achieves strong imitation from coarse syllable information alone. Given a KPMS code sequence, the actual trajectory could unfold in many different ways, so tracking reward serves as a proxy for learning the **internal dynamics** of each syllable rather than as an end goal. Two key findings emerge: **(A)** step-wise distillation best captures internal dynamics, and **(B)** learning these dynamics does not require achieving high tracking reward.
 
 <Figure>
   <Picture slot="figure" src={trainingDecomp} alt="Training curves and reward decomposition" />
@@ -107,43 +115,41 @@ Code2Act is not designed for trajectory tracking. Given the same KPMS code seque
   </Fragment>
 </Figure>
 
-Tracking reward evaluates whether the decoder follows a *specific* reference trajectory, but the real question is whether Code2Act produces movements that are **distributionally correct** — does the overall repertoire of generated behavior look like real mouse motion? To answer this, we compute Kernel Inception Distance (KID): a VAE is trained on real mocap qpos trajectories to learn a feature space, and then KID measures the distributional gap between real and generated features using an unbiased MMD estimator. Lower KID means the generated motion distribution is closer to real.
+Tracking reward evaluates adherence to a *specific* trajectory, but the deeper question is distributional: does Code2Act produce movements that match real mouse behavior as a whole? We quantify this with Kernel Inception Distance (KID), which measures the distributional gap between generated and real motion in a learned feature space. Lower KID means the generated motion distribution is closer to real.
 
 <Figure>
   <Picture slot="figure" src={kidBarplot} alt="KID comparison across methods" />
   <Fragment slot="caption">
-    **KID across conditions.** Split baseline (gray) is the noise floor from splitting real data. Mimic-MJX (oracle VAE with full trajectory access) and Code2Act (decoder with real KPMS codes) both produce motion close to real, while ARHMM-generated code sequences introduce additional distributional shift. All conditions are evaluated on 200-frame clips; error bars = std across 3 VAE seeds.
+    **Kernel Inception Distance.** Split baseline (gray) is the noise floor from splitting real data. Mimic-MJX (oracle VAE with full trajectory access) and Code2Act (decoder with real KPMS codes) both produce motion close to real, while ARHMM-generated code sequences introduce additional distributional shift. All conditions are evaluated on 200-frame clips; error bars = std across 3 VAE seeds.
   </Fragment>
 </Figure>
 
-This metric complements per-trajectory reward: while reward measures how well the decoder tracks individual clips, KID evaluates whether the *distribution* of movements — the range of speeds, postures, and joint configurations — matches real animal behavior. Notably, Code2Act with real codes (KID=1.84) achieves distribution quality comparable to the oracle Mimic-MJX (KID=1.81), suggesting that the discrete code interface preserves the statistical structure of natural behavior.
+Code2Act with real syllable codes (KID = 1.84) matches the oracle MIMIC-MJX (KID = 1.81), confirming that the discrete code interface preserves the statistical structure of natural behavior. While tracking reward measures adherence to individual clips, KID shows that the *distribution* of speeds, postures, and joint configurations matches the real animal.
 
-### Behavior Parade
+### Behavioral Repertoire
 
-The behavior parade shows the full repertoire of behaviors that Code2Act can produce. All bodies receive the same KPMS code sequence (walk → groom → rear) but start from different instantiated positions.
+The behavior parade shows the full repertoire that Code2Act produces. All bodies receive the same code sequence (walk &rarr; groom &rarr; rear) but start from different poses, demonstrating consistent, biomechanically realistic dynamics regardless of initial conditions.
 
 <Video src="behavior_parade_side.mp4" />
 
-**Behavior Parade (Side View).** A side-view parade of behaviors produced by Code2Act. All bodies receive the same KPMS code sequence but start from different instantiated positions, demonstrating that the decoder produces consistent, biomechanically realistic dynamics regardless of initial pose.
+**Behavior Parade (Side View).** All bodies receive the same KPMS code sequence but start from different instantiated positions, producing consistent dynamics regardless of initial pose.
 
 <Figure>
   <Picture slot="figure" src={paradeTrail} alt="Behavior parade motion trail" />
   <Fragment slot="caption">
-    **Behavior Parade (Motion Trail).** Frozen copies of a single body performing a rear → walk → groom transition, with a behavior-colored trajectory trace. Each copy is sampled at evenly-spaced timesteps within its behavior phase, showing how the decoder transitions between distinct motor programs.
+    **Behavior Parade (Motion Trail).** Frozen copies of a single body performing a rear &rarr; walk &rarr; groom transition, with a behavior-colored trajectory trace. Each copy is sampled at evenly-spaced timesteps within its behavior phase, showing how the decoder transitions between distinct motor programs.
   </Fragment>
 </Figure>
 
-### Single Codes vs. Code Sequences
+### From Syllables to Behavior
 
-A single discrete code alone does not carry behavioral meaning, as individual codes are only behavior primitives, not the actual behaviors we want to describe. It is the **sequence** of codes that gives rise to coherent, identifiable behavior, reflecting how biological motor programs emerge from temporal patterns of neural activity rather than isolated commands.
+Individual syllables capture fine-grained motifs that may not be interpretable alone, but their sequences paint a coarser picture from which coherent, identifiable behavior emerges.
 
 <Video src="single_code_categories_low.mp4" />
 
-**Single code rollouts.** Repeating a single KPMS code produces only primitive motion fragments. Behavioral identity emerges only when codes are composed into sequences, demonstrating that Code2Act's motor programs are fundamentally **sequential** rather than instantaneous.
+**Single code rollouts.** Repeating a single KPMS code produces only a primitive motion fragment. Behavioral identity emerges only when codes compose into sequences, reflecting how biological motor programs arise from temporal patterns of neural activity rather than isolated commands.
 
-### Code Sequences are Instructional
-
-Providing walk codes produces walking behavior, groom codes produce grooming, and rear codes produce rearing. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
+Providing walk codes produces walking, groom codes produce grooming, and rear codes produce rearing, regardless of the starting pose. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
 
 <Video src="behavior_triptych_low.mp4" />
 
@@ -160,7 +166,7 @@ Providing walk codes produces walking behavior, groom codes produce grooming, an
   </Fragment>
 </Figure>
 
-The kinematic signature plots below quantify the behavioral differences produced by each code category. For each behavior (Walk, Groom, Rear), we measure three kinematic features across rollouts: XY speed (locomotion), root Z height (posture), and joint angular velocity (activity). Individual dots show per-clip values.
+The kinematic signatures below quantify the behavioral differences produced by each code category. Walk codes produce the highest XY speed and joint activity; rear codes produce the highest vertical posture; groom codes remain stationary with minimal joint movement. This pattern holds across both starting pose conditions, confirming that syllable codes are **instructional**, reliably driving distinct motor dynamics regardless of starting state.
 
 <TwoColumns>
   <Figure slot="left">
@@ -177,30 +183,28 @@ The kinematic signature plots below quantify the behavioral differences produced
   </Figure>
 </TwoColumns>
 
-Walk codes produce the highest XY speed and joint activity; rear codes produce the highest vertical posture; groom codes remain stationary with minimal joint movement. This pattern holds across both initial pose conditions, confirming that codes are **instructional** — they reliably drive distinct kinematics regardless of starting state.
-
-The displacement plots below show the same result as time series, tracking cumulative horizontal (Δxy) and vertical (Δz) displacement over the episode.
-
 <TwoColumns>
   <Figure slot="left">
     <Picture slot="figure" src={displacementHigh} alt="Code sequence displacement from rear pose" />
     <Fragment slot="caption">
-      **Rear pose initialization.** Vertical (Δz) and horizontal (Δxy) displacement.
+      **Rear pose initialization.** Vertical (&Delta;z) and horizontal (&Delta;xy) displacement.
     </Fragment>
   </Figure>
   <Figure slot="right">
     <Picture slot="figure" src={displacementLow} alt="Code sequence displacement from walk pose" />
     <Fragment slot="caption">
-      **Walk pose initialization.** Vertical (Δz) and horizontal (Δxy) displacement.
+      **Walk pose initialization.** Vertical (&Delta;z) and horizontal (&Delta;xy) displacement.
     </Fragment>
   </Figure>
 </TwoColumns>
 
-Walk codes (orange) produce large XY displacement; rear codes (green) show distinct Z dynamics; groom codes (blue) remain stationary. Mean ± SEM across surviving trajectories.
+Walk codes (orange) produce large XY displacement; rear codes (green) show distinct vertical dynamics; groom codes (blue) remain stationary. Mean &plusmn; SEM across surviving trajectories.
 
-### Generative Code Sequences
+### Planning in Syllable Space
 
-Code2Act turns behavior generation into a **code sequencing** problem. We fit generative models (empirical transition matrix, HMM, ARHMM) to the KPMS code sequences and use them to generate novel code sequences. These generated sequences produce coherent free-loop behavior without any reference trajectory.
+By internalizing the dynamics of each syllable from physics-based training, Code2Act reframes behavior generation as **planning in syllable space** rather than rollout in a simulator. Because these dynamics are grounded in an embodied controller, each syllable captures *how* behavior is produced, not just what it looks like at the keypoint level.
+
+We fit generative models (empirical transition matrix, HMM, ARHMM) to KPMS code sequences and use them to generate novel sequences. These generate coherent, free-running whole-body behavior without any reference trajectory.
 
 <Video src="code_generation_triptych.mp4" />
 
@@ -212,7 +216,9 @@ Code2Act turns behavior generation into a **code sequencing** problem. We fit ge
 
 ## Conclusion
 
-**Code2Act** preserves the internal dynamics of each discrete syllable, turning naturalistic behavior generation into a problem of **code sequencing** rather than repeated interaction with a physics engine. This provides both an engineering solution for planning naturalistic behavioral sequences without relying on physics, and a generative modeling framework, akin to fitting an ARHMM, for synthesizing whole-body behavior. Code2Act bridges the gap between probabilistic state space models, which capture behavioral structure, and reinforcement learning, which produces motor control, by using discrete syllable codes as the interface between structure and action.
+Code2Act demonstrates that discrete behavioral syllables, grounded in physics-based motor control, serve as a sufficient interface for generating naturalistic whole-body behavior. By distilling the dynamics of each syllable from embodied training, the system internalizes *how* behavior is produced, not just what it looks like. This turns behavior generation into a problem of **planning in syllable space**: sequencing discrete codes rather than rolling out a physics engine.
+
+The result bridges two historically separate approaches, probabilistic state-space models that capture behavioral structure and reinforcement learning that produces motor control, by using syllable codes as the interface between structure and action. Code2Act provides both an engineering solution for planning behavioral sequences without physics, and a generative modeling framework for synthesizing whole-body behavior through syllable code sequences.
 
 ## Citation
 
