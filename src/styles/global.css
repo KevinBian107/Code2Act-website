@@ -18,6 +18,15 @@
   width: 100%;
 }
 
+/* Ensure videos render properly inside prose */
+.prose video {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
 html {
   /* Enables container query units (e.g., 100cqw) for layout calculations in main. */
   container-type: inline-size;

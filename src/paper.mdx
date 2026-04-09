@@ -15,6 +15,8 @@ authors:
     notes: ["2,3"]
   - name: "Eric J. Leonardis"
     notes: ["1"]
+  - name: "Blake A. Richards"
+    notes: ["8,9"]
   - name: "Bence P. Ölveczky"
     notes: ["6"]
   - name: "Scott W. Linderman"
@@ -32,7 +34,7 @@ links:
     url: https://github.com/talmolab/track-mjx/tree/kevin/kpms-decoder
     icon: ri:github-line
 theme: light
-favicon: favicon.svg
+favicon: favicon.png
 description: "Code to Action: Motor Programs from Discrete Syllables in Whole-Body Biomechanical Control"
 ---
 
@@ -41,10 +43,18 @@ import Figure from "./components/Figure.astro";
 import Picture from "./components/Picture.astro";
 import Video from "./components/Video.astro";
 import Wide from "./components/Wide.astro";
+import TwoColumns from "./components/TwoColumns.astro";
 import pipelineFig from "./assets/moseq_prior_distill_pipeline.png";
 import kpmsExample from "./assets/kpms_to_action_example.png";
 import trainingDecomp from "./assets/training_and_decomposition.png";
+import kinematicSigLow from "./assets/kinematic_signatures_low.png";
+import kinematicSigHigh from "./assets/kinematic_signatures_high.png";
 import displacementLow from "./assets/code_sequence_displacement_low.png";
+import displacementHigh from "./assets/code_sequence_displacement_high.png";
+import code2actPipeline from "./assets/code2act_pipeline.png";
+import mimicTraining from "./assets/mimic_training.png";
+import paradeTrail from "./assets/parade_trail_rwg.png";
+import triptychTrailLow from "./assets/behavior_triptych_trail_low.png";
 
 <HighlightedSection>
 
@@ -56,11 +66,7 @@ Animals don't move by stringing together independent actions; they fluidly switc
 
 ## Problem Statement
 
-**Probabilistic State Space Models** (PSSMs) model the dynamics of the trajectories well. They model the switching and segmental behaviors, but they fail to serve as a generative model of trajectories.
-
-**Reinforcement Learning** (RL) are widely used for low-level motor control, but the learned latent of an end-to-end imitation model is not used for regeneration.
-
-Current models capture what behavior looks like, but none can generate it with discrete syllable-level control.
+Probabilistic state space models (SSMs) capture the dynamics of behavioral trajectories well, segmenting switching and segmental behaviors into discrete syllables, but they fail to serve as generative models of physically realistic trajectories. Reinforcement learning (RL), on the other hand, is widely used for low-level motor control, yet the learned latent representations of end-to-end imitation models are typically unstructured and not reused for regeneration. Current approaches capture what behavior *looks like*, but none can generate it with discrete syllable-level control.
 
 <Figure>
   <Picture slot="figure" src={kpmsExample} alt="KPMS to action mapping example" />
@@ -74,7 +80,14 @@ Current models capture what behavior looks like, but none can generate it with d
 Code2Act uses a **prior distillation** pipeline where a pre-trained encoder-decoder VAE provides the action generation backbone, and a GRU-based RNN learns to predict the encoder's latent distribution from discrete syllable codes.
 
 <Figure>
-  <Picture slot="figure" src={pipelineFig} alt="Code2Act prior distillation pipeline" />
+  <Picture slot="figure" src={mimicTraining} alt="MIMIC-MJX training pipeline" />
+  <Fragment slot="caption">
+    **MIMIC-MJX Training.** The base imitation learning framework trains an encoder-decoder VAE policy to track reference trajectories from inverse kinematics, producing motor commands that drive a biomechanical rodent body in MuJoCo MJX.
+  </Fragment>
+</Figure>
+
+<Figure>
+  <Picture slot="figure" src={code2actPipeline} alt="Code2Act prior distillation pipeline" />
   <Fragment slot="caption">
     **Code2Act Pipeline.** Keypoint-MoSeq segments reference trajectories into discrete syllable codes. A GRU-based RNN decoder takes (code embedding, proprioception) as input and produces hidden states. A unified VAE head maps the hidden state to a latent distribution (mu, sigma), from which z is sampled and fed through the pre-trained VAE decoder to produce motor commands. During training, a frozen pre-trained encoder provides KL alignment targets.
   </Fragment>
@@ -84,7 +97,7 @@ Code2Act uses a **prior distillation** pipeline where a pre-trained encoder-deco
 
 ### Training Performance and Reward Decomposition
 
-Code2Act achieves competitive imitation reward with the oracle VAE (Mimic-MJX) that has access to the full reference trajectory. The reward decomposition shows strong performance on coarse (root position/orientation) and fine (joint/end-effector) tracking.
+Code2Act is not designed for trajectory tracking. Given the same KPMS code sequence, the real trajectory could unfold in thousands of different ways. Instead, tracking reward serves as a proxy for learning the **internal dynamics** of each behavioral syllable. Code2Act achieves competitive imitation reward with the oracle VAE (Mimic-MJX) that has access to the full reference trajectory, indicating that the discrete code interface retains enough information to recover the underlying motor programs.
 
 <Figure>
   <Picture slot="figure" src={trainingDecomp} alt="Training curves and reward decomposition" />
@@ -93,24 +106,85 @@ Code2Act achieves competitive imitation reward with the oracle VAE (Mimic-MJX) t
   </Fragment>
 </Figure>
 
-### Behavior Instantiation
+### Behavior Parade
 
-Code sequences are **instructional**: providing walk codes produces walking behavior, groom codes produce grooming, and rear codes produce rearing. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
+The behavior parade shows the full repertoire of behaviors that Code2Act can produce, driven by different KPMS code sequences.
+
+<Video src="behavior_parade_side.mp4" />
+
+**Behavior Parade (Side View).** A side-view parade of behaviors produced by Code2Act, each driven by a different KPMS code sequence. The decoder produces distinct, biomechanically realistic dynamics for each behavioral syllable.
+
+<Figure>
+  <Picture slot="figure" src={paradeTrail} alt="Behavior parade motion trail" />
+  <Fragment slot="caption">
+    **Behavior Parade (Motion Trail).** Frozen copies of a single body performing a rear → walk → groom transition, with a behavior-colored trajectory trace. Each copy is sampled at evenly-spaced timesteps within its behavior phase, showing how the decoder transitions between distinct motor programs.
+  </Fragment>
+</Figure>
+
+### Single Codes vs. Code Sequences
+
+A single discrete code alone does not carry behavioral meaning, as individual codes are only behavior primitives, not the actual behaviors we want to describe. It is the **sequence** of codes that gives rise to coherent, identifiable behavior, reflecting how biological motor programs emerge from temporal patterns of neural activity rather than isolated commands.
+
+<Video src="single_code_categories_low.mp4" />
+
+**Single code rollouts.** Repeating a single KPMS code produces only primitive motion fragments. Behavioral identity emerges only when codes are composed into sequences, demonstrating that Code2Act's motor programs are fundamentally **sequential** rather than instantaneous.
+
+### Code Sequences are Instructional
+
+Providing walk codes produces walking behavior, groom codes produce grooming, and rear codes produce rearing. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
 
 <Video src="behavior_triptych_low.mp4" />
 
-**Walk Pose Instantiation.** K=6 trajectories per behavior (Groom | Walk | Rear), all initialized from a walk-like starting pose. Each colored body is an independent rollout driven by the same KPMS code sequence. The decoder produces behavior-appropriate dynamics for each syllable.
+**Walk Pose Instantiation.** K=6 trajectories per behavior (Groom | Walk | Rear), all initialized from a walk-like starting pose. The decoder produces behavior-appropriate dynamics regardless of initial pose.
 
-### Code Sequence Displacement
+<Video src="behavior_triptych_high.mp4" />
 
-Code sequences produce **interpretable kinematics**: walk codes drive horizontal (X-Y) displacement while groom and rear codes produce minimal locomotion. Vertical (Z) displacement distinguishes rearing from other behaviors.
+**Rear Pose Instantiation.** K=6 trajectories per behavior (Groom | Walk | Rear), all initialized from a rear-like starting pose. Each colored body is an independent rollout driven by the same KPMS code sequence.
 
 <Figure>
-  <Picture slot="figure" src={displacementLow} alt="Code sequence displacement analysis" />
+  <Picture slot="figure" src={triptychTrailLow} alt="Behavior triptych motion trails from walk pose" />
   <Fragment slot="caption">
-    **Walk Pose Instantiation displacement.** Left: vertical displacement (Δz) from initial position. Right: horizontal displacement (Δxy). Walk codes (orange) produce large XY displacement; rear codes (green) show distinct Z dynamics; groom codes (blue) remain stationary. Mean ± SEM across surviving trajectories.
+    **Walk Pose Motion Trails.** Frozen-copy trails for each behavior (Groom | Walk | Rear), all from the same walk-like initial pose. Walk codes produce extended forward trajectories, groom codes remain stationary, and rear codes show vertical displacement with minimal horizontal drift.
   </Fragment>
 </Figure>
+
+The kinematic signature plots below quantify the behavioral differences produced by each code category. For each behavior (Walk, Groom, Rear), we measure three kinematic features across rollouts: XY speed (locomotion), root Z height (posture), and joint angular velocity (activity). Individual dots show per-clip values.
+
+<TwoColumns>
+  <Figure slot="left">
+    <Picture slot="figure" src={kinematicSigLow} alt="Kinematic signatures from walk pose" />
+    <Fragment slot="caption">
+      **Walk pose instantiation.** XY speed, root Z height, and joint angular velocity per behavior.
+    </Fragment>
+  </Figure>
+  <Figure slot="right">
+    <Picture slot="figure" src={kinematicSigHigh} alt="Kinematic signatures from rear pose" />
+    <Fragment slot="caption">
+      **Rear pose instantiation.** XY speed, root Z height, and joint angular velocity per behavior.
+    </Fragment>
+  </Figure>
+</TwoColumns>
+
+Walk codes produce the highest XY speed and joint activity; rear codes produce the highest vertical posture; groom codes remain stationary with minimal joint movement. This pattern holds across both initial pose conditions, confirming that codes are **instructional** — they reliably drive distinct kinematics regardless of starting state.
+
+The displacement plots below show the same result as time series, tracking cumulative horizontal (Δxy) and vertical (Δz) displacement over the episode.
+
+<TwoColumns>
+  <Figure slot="left">
+    <Picture slot="figure" src={displacementHigh} alt="Code sequence displacement from rear pose" />
+    <Fragment slot="caption">
+      **Rear pose initialization.** Vertical (Δz) and horizontal (Δxy) displacement.
+    </Fragment>
+  </Figure>
+  <Figure slot="right">
+    <Picture slot="figure" src={displacementLow} alt="Code sequence displacement from walk pose" />
+    <Fragment slot="caption">
+      **Walk pose initialization.** Vertical (Δz) and horizontal (Δxy) displacement.
+    </Fragment>
+  </Figure>
+</TwoColumns>
+
+Walk codes (orange) produce large XY displacement; rear codes (green) show distinct Z dynamics; groom codes (blue) remain stationary. Mean ± SEM across surviving trajectories.
 
 ### Generative Code Sequences
 
@@ -118,16 +192,15 @@ Code2Act turns behavior generation into a **code sequencing** problem. We fit ge
 
 <Video src="code_generation_triptych.mp4" />
 
-**Free-loop generation.** Novel code sequences sampled from learned generative models (Transition Matrix | HMM | ARHMM) produce coherent whole-body behavior. No reference trajectory is provided — the decoder autonomously translates the generated code sequence into motor commands.
+**Free-loop generation.** Novel code sequences sampled from learned generative models (Transition Matrix | HMM | ARHMM) produce coherent whole-body behavior. No reference trajectory is provided; the decoder autonomously translates the generated code sequence into motor commands.
+
+<Video src="code_generation_baselines_triptych.mp4" />
+
+**Baseline comparison.** Code sequences generated from baseline models compared against Code2Act, demonstrating the quality of behavior generation across different generative modeling approaches.
 
 ## Conclusion
 
-**Code2Act** preserves the internal dynamics of each discrete syllable, turning naturalistic behavior generation into a problem of **code sequencing** rather than repeated interaction with a physics engine.
-
-- **(1)** An engineering solution for **planning** naturalistic behavioral sequences without relying on physics.
-- **(2)** A generative modeling framework, akin to fitting an ARHMM, for synthesizing whole-body behavior.
-
-Code2Act bridges the gap between probabilistic state space models (which capture behavioral structure) and reinforcement learning (which produces motor control), by using discrete syllable codes as the interface between structure and action.
+**Code2Act** preserves the internal dynamics of each discrete syllable, turning naturalistic behavior generation into a problem of **code sequencing** rather than repeated interaction with a physics engine. This provides both an engineering solution for planning naturalistic behavioral sequences without relying on physics, and a generative modeling framework, akin to fitting an ARHMM, for synthesizing whole-body behavior. Code2Act bridges the gap between probabilistic state space models, which capture behavioral structure, and reinforcement learning, which produces motor control, by using discrete syllable codes as the interface between structure and action.
 
 ## Citation
 
@@ -138,6 +211,7 @@ Code2Act bridges the gap between probabilistic state space models (which capture
   author={Bian, Kaiwen and Zhang, Charles Y. and Yang, Yuanjia
           and Sirbu, Aidan and Jha, Aditi
           and Buchanan, Kelly and Leonardis, Eric J.
+          and Richards, Blake A.
           and {\"O}lveczky, Bence P. and Linderman, Scott W.
           and Pereira, Talmo D.},
   journal={arXiv preprint},

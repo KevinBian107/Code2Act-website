@@ -21,10 +21,13 @@ const resolvedSrc = src.startsWith("/") || src.startsWith("http") ? src : prefix
 
 <video
   class="aspect-video h-auto w-full rounded-lg"
-  src={resolvedSrc}
   controls={controls}
   loop={loop}
   playsinline={playsinline}
   muted={muted}
   autoplay={autoplay}
-  {...videoProps}></video>
+  preload="auto"
+  {...videoProps}>
+  <source src={resolvedSrc} type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
