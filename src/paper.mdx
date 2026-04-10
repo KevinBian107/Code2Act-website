@@ -56,6 +56,7 @@ import code2actPipeline from "./assets/code2act_pipeline.png";
 import mimicTraining from "./assets/mimic_training.png";
 import paradeTrail from "./assets/parade_trail_rwg.png";
 import triptychTrailLow from "./assets/behavior_triptych_trail_low.png";
+import psdOverlay from "./assets/psd_overlay_right.png";
 
 <HighlightedSection>
 
@@ -125,6 +126,15 @@ Tracking reward evaluates adherence to a *specific* trajectory, but the deeper q
 </Figure>
 
 Code2Act with real syllable codes (KID = 1.84) matches the oracle MIMIC-MJX (KID = 1.81), confirming that the discrete code interface preserves the statistical structure of natural behavior. While tracking reward measures adherence to individual clips, KID shows that the *distribution* of speeds, postures, and joint configurations matches the real animal.
+
+Code2Act reproduces the dominant gait frequency of Mimic-MJX across all hind limb joints in walking clips. Hip joints show closer spectral alignment than knee, indicating that coarse locomotion dynamics are captured better than fine-grained joint articulation.
+
+<Figure>
+  <Picture slot="figure" src={psdOverlay} alt="Power spectral density overlay for hind limb joints" />
+  <Fragment slot="caption">
+    **Power Spectral Density.** PSD overlay comparing Code2Act (blue) and Mimic-MJX (orange) for right hind limb joints during walking. Both models share the dominant gait frequency, with hip showing tighter spectral alignment than knee.
+  </Fragment>
+</Figure>
 
 ### Behavioral Repertoire
 
