@@ -53,6 +53,7 @@ import kinematicSigHigh from "./assets/kinematic_signatures_high.png";
 import displacementLow from "./assets/code_sequence_displacement_low.png";
 import displacementHigh from "./assets/code_sequence_displacement_high.png";
 import code2actPipeline from "./assets/code2act_pipeline.png";
+import code2actHighlevel from "./assets/code2act_highlevel.png";
 import mimicTraining from "./assets/mimic_training_v2.png";
 import paradeTrail from "./assets/parade_trail_rwg.png";
 import triptychTrailLow from "./assets/behavior_triptych_trail_low_v2.png";
@@ -85,6 +86,13 @@ Code2Act bridges this gap by treating discrete syllable codes as the interface b
 </Figure>
 
 ## Pipeline Overview
+
+<Figure>
+  <Picture slot="figure" src={code2actHighlevel} alt="Code2Act high-level overview" />
+  <Fragment slot="caption">
+    **Code2Act Overview.** Discrete syllable codes from Keypoint-MoSeq drive a recurrent code decoder that produces motor actions; proprioceptive state feeds back from the physics simulation to close the loop.
+  </Fragment>
+</Figure>
 
 Code2Act follows a **prior distillation** architecture. First, MIMIC-MJX trains an encoder-decoder VAE policy to imitate naturalistic rodent trajectories from inverse kinematics, producing motor commands for a biomechanical rodent body in MuJoCo MJX.
 
@@ -136,7 +144,7 @@ Code2Act also reproduces the fine temporal structure of locomotion. The power sp
 
 ### Behavioral Repertoire
 
-The behavior parade shows the full repertoire that Code2Act produces. All bodies receive the same code sequence (walk &rarr; groom &rarr; rear) but start from different poses, demonstrating consistent, biomechanically realistic dynamics regardless of initial conditions.
+The behavior parade shows the full repertoire that Code2Act produces. All bodies receive the same code sequence (walk &rarr; immobility &rarr; rear) but start from different poses, demonstrating consistent, biomechanically realistic dynamics regardless of initial conditions.
 
 <Video src="behavior_parade_side.mp4" />
 
@@ -145,7 +153,7 @@ The behavior parade shows the full repertoire that Code2Act produces. All bodies
 <Figure>
   <Picture slot="figure" src={paradeTrail} alt="Behavior parade motion trail" />
   <Fragment slot="caption">
-    **Behavior Parade (Motion Trail).** Frozen copies of a single body performing a rear &rarr; walk &rarr; groom transition, with a behavior-colored trajectory trace. Each copy is sampled at evenly-spaced timesteps within its behavior phase, showing how the decoder transitions between distinct motor programs.
+    **Behavior Parade (Motion Trail).** Frozen copies of a single body performing a rear &rarr; walk &rarr; immobility transition, with a behavior-colored trajectory trace. Each copy is sampled at evenly-spaced timesteps within its behavior phase, showing how the decoder transitions between distinct motor programs.
   </Fragment>
 </Figure>
 
@@ -157,36 +165,36 @@ Individual syllables capture fine-grained motifs that may not be interpretable a
 
 **Single code rollouts.** Repeating a single KPMS code produces only a primitive motion fragment. Behavioral identity emerges only when codes compose into sequences, reflecting how biological motor programs arise from temporal patterns of neural activity rather than isolated commands.
 
-Providing walk codes produces walking, groom codes produce grooming, and rear codes produce rearing, regardless of the starting pose. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
+Providing walk codes produces walking, immobility codes produce stillness, and rear codes produce rearing, regardless of the starting pose. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
 
 <Video src="behavior_triptych_low.mp4" />
 
-**Walk Pose Instantiation.** K=6 trajectories per behavior (Groom | Walk | Rear), all initialized from a walk-like starting pose. The decoder produces behavior-appropriate dynamics regardless of initial pose.
+**Walk Pose Instantiation.** K=6 trajectories per behavior (Immobility | Walk | Rear), all initialized from a walk-like starting pose. The decoder produces behavior-appropriate dynamics regardless of initial pose.
 
 <Video src="behavior_triptych_high.mp4" />
 
-**Rear Pose Instantiation.** K=6 trajectories per behavior (Groom | Walk | Rear), all initialized from a rear-like starting pose. Each colored body is an independent rollout driven by the same KPMS code sequence.
+**Rear Pose Instantiation.** K=6 trajectories per behavior (Immobility | Walk | Rear), all initialized from a rear-like starting pose. Each colored body is an independent rollout driven by the same KPMS code sequence.
 
 <Figure>
   <Picture slot="figure" src={triptychTrailLow} alt="Behavior triptych motion trails from walk pose" />
   <Fragment slot="caption">
-    **Walk Pose Motion Trails.** Frozen-copy trails for each behavior (Groom | Walk | Rear), all from the same walk-like initial pose. Walk codes produce extended forward trajectories, groom codes remain stationary, and rear codes show vertical displacement with minimal horizontal drift.
+    **Walk Pose Motion Trails.** Frozen-copy trails for each behavior (Immobility | Walk | Rear), all from the same walk-like initial pose. Walk codes produce extended forward trajectories, immobility codes remain stationary, and rear codes show vertical displacement with minimal horizontal drift.
   </Fragment>
 </Figure>
 
-The kinematic signatures below quantify the behavioral differences produced by each code category. Walk codes produce the highest XY speed and joint activity; rear codes produce the highest vertical posture; groom codes remain stationary with minimal joint movement. This pattern holds across both starting pose conditions, confirming that syllable codes are **instructional**, reliably driving distinct motor dynamics regardless of starting state.
+The kinematic signatures below quantify the behavioral differences produced by each code category. Walk codes produce the highest XY speed and joint activity across both forelimbs and hindlimbs; rear codes produce the highest vertical posture with strong hindlimb drive; immobility codes remain stationary with minimal joint movement in all limbs. This pattern holds across both starting pose conditions, confirming that syllable codes are **instructional**, reliably driving distinct motor dynamics regardless of starting state.
 
 <TwoColumns>
   <Figure slot="left">
     <Picture slot="figure" src={kinematicSigLow} alt="Kinematic signatures from walk pose" />
     <Fragment slot="caption">
-      **Walk pose instantiation.** XY speed, root Z height, and joint angular velocity per behavior.
+      **Walk pose instantiation.** XY speed, root Z height, and forelimb/hindlimb angular velocity per behavior.
     </Fragment>
   </Figure>
   <Figure slot="right">
     <Picture slot="figure" src={kinematicSigHigh} alt="Kinematic signatures from rear pose" />
     <Fragment slot="caption">
-      **Rear pose instantiation.** XY speed, root Z height, and joint angular velocity per behavior.
+      **Rear pose instantiation.** XY speed, root Z height, and forelimb/hindlimb angular velocity per behavior.
     </Fragment>
   </Figure>
 </TwoColumns>
@@ -206,7 +214,7 @@ The kinematic signatures below quantify the behavioral differences produced by e
   </Figure>
 </TwoColumns>
 
-Walk codes (orange) produce large XY displacement; rear codes (green) show distinct vertical dynamics; groom codes (blue) remain stationary. Mean &plusmn; SEM across surviving trajectories.
+Walk codes (orange) produce large XY displacement; rear codes (green) show distinct vertical dynamics; immobility codes (blue) remain stationary. Mean &plusmn; SEM across surviving trajectories.
 
 ### Planning in Syllable Space
 
