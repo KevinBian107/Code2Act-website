@@ -200,13 +200,13 @@ The kinematic signatures below quantify the behavioral differences produced by e
   <Figure slot="left">
     <Picture slot="figure" src={kinematicSigLow} alt="Kinematic signatures from walk pose" />
     <Fragment slot="caption">
-      **Walk pose instantiation.** XY speed, root Z height, and forelimb/hindlimb angular velocity per behavior.
+      **Walk pose instantiation.** Violin plots of XY speed, root Z height, and forelimb/hindlimb angular velocity (shoulder/elbow/wrist vs hip/knee/ankle) per behavior. Individual dots = per-clip values.
     </Fragment>
   </Figure>
   <Figure slot="right">
     <Picture slot="figure" src={kinematicSigHigh} alt="Kinematic signatures from rear pose" />
     <Fragment slot="caption">
-      **Rear pose instantiation.** XY speed, root Z height, and forelimb/hindlimb angular velocity per behavior.
+      **Rear pose instantiation.** Same metrics from a rear-like starting pose. The pattern holds: walk codes produce the highest locomotion and joint activity, immobility codes remain still, and rear codes drive vertical posture with strong hindlimb engagement.
     </Fragment>
   </Figure>
 </TwoColumns>
@@ -247,7 +247,7 @@ To quantify how realistic the generated behavior is, we compute Kernel Inception
 <Figure>
   <Picture slot="figure" src={kidBarplot} alt="KID comparison across methods" />
   <Fragment slot="caption">
-    **Kernel Inception Distance.** Lower is better. All conditions produce behavior distributionally close to real. Error bars = std across 3 VAE seeds; 200-frame clips.
+    **Distribution Quality: Real vs Generated Behavior.** KID (lower is better) comparing Code2Act with actual KPMS codes, transition matrix sampling, ARHMM generation, and random codes. All structured code generation methods produce behavior distributionally close to real, while random codes diverge sharply. Error bars = std across 3 VAE seeds; 200-frame clips.
   </Fragment>
 </Figure>
 
