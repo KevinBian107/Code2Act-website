@@ -116,23 +116,12 @@ Code2Act achieves strong imitation from coarse syllable information alone. Given
   </Fragment>
 </Figure>
 
-Tracking reward evaluates adherence to a *specific* trajectory, but the deeper question is distributional: does Code2Act produce movements that match real mouse behavior as a whole? We quantify this with Kernel Inception Distance (KID), which measures the distributional gap between generated and real motion in a learned feature space. Lower KID means the generated motion distribution is closer to real.
-
-<Figure>
-  <Picture slot="figure" src={kidBarplot} alt="KID comparison across methods" />
-  <Fragment slot="caption">
-    **Kernel Inception Distance.** Split baseline (gray) is the noise floor from splitting real data. Mimic-MJX (oracle VAE with full trajectory access) and Code2Act (decoder with real KPMS codes) both produce motion close to real, while ARHMM-generated code sequences introduce additional distributional shift. All conditions are evaluated on 200-frame clips; error bars = std across 3 VAE seeds.
-  </Fragment>
-</Figure>
-
-Code2Act with real syllable codes (KID = 1.84) matches the oracle MIMIC-MJX (KID = 1.81), confirming that the discrete code interface preserves the statistical structure of natural behavior. While tracking reward measures adherence to individual clips, KID shows that the *distribution* of speeds, postures, and joint configurations matches the real animal.
-
-Code2Act reproduces the dominant gait frequency of Mimic-MJX across all hind limb joints in walking clips. Hip joints show closer spectral alignment than knee, indicating that coarse locomotion dynamics are captured better than fine-grained joint articulation.
+Code2Act also reproduces the fine temporal structure of locomotion. The power spectral density of hind limb joint angles during walking shows that Code2Act captures the dominant gait frequency of Mimic-MJX across all joints. Hip joints show tighter spectral alignment than knee, indicating that coarse locomotion dynamics are captured more faithfully than fine-grained joint articulation.
 
 <Figure>
   <Picture slot="figure" src={psdOverlay} alt="Power spectral density overlay for hind limb joints" />
   <Fragment slot="caption">
-    **Power Spectral Density.** PSD overlay comparing Code2Act (blue) and Mimic-MJX (orange) for right hind limb joints during walking. Both models share the dominant gait frequency, with hip showing tighter spectral alignment than knee.
+    **Power Spectral Density.** PSD overlay comparing Code2Act (blue) and Mimic-MJX (orange) for right hind limb joints during walking. Both share the dominant gait frequency, with hip showing closer spectral alignment than knee.
   </Fragment>
 </Figure>
 
@@ -223,6 +212,15 @@ We fit generative models (empirical transition matrix, HMM, ARHMM) to KPMS code 
 <Video src="code_generation_baselines_triptych.mp4" />
 
 **Baseline comparison.** Code sequences generated from baseline models compared against Code2Act, demonstrating the quality of behavior generation across different generative modeling approaches.
+
+To quantify the quality of generated behavior, we compute Kernel Inception Distance (KID) using a VAE trained on real mocap trajectories as a feature extractor. KID measures how closely the distribution of generated behavior matches real behavior in this learned feature space. Code2Act with real KPMS codes achieves the lowest KID, while generative code models (ARHMM, transition matrix) introduce additional distributional shift from sampling in code space rather than replaying recorded sequences.
+
+<Figure>
+  <Picture slot="figure" src={kidBarplot} alt="KID comparison across methods" />
+  <Fragment slot="caption">
+    **Kernel Inception Distance.** Lower is better. Code2Act with real KPMS codes produces behavior closest to the real distribution. ARHMM and transition matrix models generate plausible code sequences but introduce distributional shift. Error bars = std across 3 VAE seeds; 200-frame clips.
+  </Fragment>
+</Figure>
 
 ## Conclusion
 
