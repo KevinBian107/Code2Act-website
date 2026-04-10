@@ -59,6 +59,7 @@ import paradeTrail from "./assets/parade_trail_rwg.png";
 import triptychTrailLow from "./assets/behavior_triptych_trail_low_v2.png";
 import psdOverlayLeft from "./assets/psd_overlay_left.png";
 import psdOverlayRight from "./assets/psd_overlay_right_v2.png";
+import hiddenScatter from "./assets/hidden_scatter_pca3d.png";
 
 <HighlightedSection>
 
@@ -141,6 +142,17 @@ Code2Act also reproduces the fine temporal structure of locomotion. The power sp
     </Fragment>
   </Figure>
 </TwoColumns>
+
+### Within-Syllable Dynamics
+
+Each syllable code selects *which* behavior to produce, but the RNN decoder must generate the continuous motor dynamics *within* that syllable. PCA of the GRU hidden state reveals that the decoder learns distinct dynamical regimes for each behavior: walking codes drive extended, looping trajectories through hidden state space reflecting rhythmic gait cycles; immobility codes collapse to a tight, low-variance region; and rearing codes trace compact arcs corresponding to the transient lift-and-hold dynamics. These trajectories occupy separable regions of hidden state space, confirming that the decoder internalizes qualitatively different dynamics per syllable rather than routing all behaviors through a shared dynamical regime.
+
+<Figure>
+  <Picture slot="figure" src={hiddenScatter} alt="PCA of RNN hidden state per behavior" />
+  <Fragment slot="caption">
+    **Within-syllable hidden state dynamics.** 3D PCA of GRU hidden states across K=10 rollouts per behavior, projected onto shared principal components. Walking codes produce extended trajectories reflecting rhythmic gait dynamics; immobility codes collapse to a compact cluster; rearing codes trace transient arcs. Each behavior occupies a distinct region of hidden state space.
+  </Fragment>
+</Figure>
 
 ### Behavioral Repertoire
 
