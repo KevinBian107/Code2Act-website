@@ -145,7 +145,7 @@ Code2Act also reproduces the fine temporal structure of locomotion. The power sp
 
 ### Within-Syllable Dynamics
 
-Each syllable code selects *which* behavior to produce, but the RNN decoder must generate the continuous motor dynamics *within* that syllable. PCA of the GRU hidden state reveals that the decoder learns distinct dynamical regimes for each behavior: walking codes drive extended, looping trajectories through hidden state space reflecting rhythmic gait cycles; immobility codes collapse to a tight, low-variance region; and rearing codes trace compact arcs corresponding to the transient lift-and-hold dynamics. These trajectories occupy separable regions of hidden state space, confirming that the decoder internalizes qualitatively different dynamics per syllable rather than routing all behaviors through a shared dynamical regime.
+Although individual syllable codes do not map one-to-one to pure behaviors — they are learned from continuous reference data — the RNN decoder learns distinct dynamical regimes per syllable. PCA of the GRU hidden state reveals that walking codes drive extended, looping trajectories through hidden state space reflecting rhythmic gait cycles; immobility codes collapse to a tight, low-variance region; and rearing codes trace compact arcs corresponding to transient lift-and-hold dynamics. These trajectories occupy separable regions of hidden state space, confirming that the decoder internalizes qualitatively different dynamics per syllable rather than routing all behaviors through a shared dynamical regime.
 
 <Figure>
   <Picture slot="figure" src={hiddenScatter} alt="PCA of RNN hidden state per behavior" />
