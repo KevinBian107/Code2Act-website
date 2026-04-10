@@ -56,7 +56,8 @@ import code2actPipeline from "./assets/code2act_pipeline.png";
 import mimicTraining from "./assets/mimic_training.png";
 import paradeTrail from "./assets/parade_trail_rwg.png";
 import triptychTrailLow from "./assets/behavior_triptych_trail_low.png";
-import psdOverlay from "./assets/psd_overlay_right.png";
+import psdOverlayLeft from "./assets/psd_overlay_left.png";
+import psdOverlayRight from "./assets/psd_overlay_right.png";
 
 <HighlightedSection>
 
@@ -116,14 +117,22 @@ Code2Act achieves strong imitation from coarse syllable information alone. Given
   </Fragment>
 </Figure>
 
-Code2Act also reproduces the fine temporal structure of locomotion. The power spectral density of hind limb joint angles during walking shows that Code2Act captures the dominant gait frequency of Mimic-MJX across all joints. Hip joints show tighter spectral alignment than knee, indicating that coarse locomotion dynamics are captured more faithfully than fine-grained joint articulation.
+Code2Act also reproduces the fine temporal structure of locomotion. The power spectral density of hind limb joint angles during walking reveals that Code2Act captures the dominant ~2 Hz gait frequency of Mimic-MJX bilaterally, confirming the decoder preserves the fundamental locomotion rhythm from coarse syllable codes alone. Proximal joints (hip) show tight spectral overlap on both sides, while distal joints (knee) show more divergence, with Code2Act slightly underestimating peak power. This indicates that coarse locomotion dynamics are captured faithfully, with expected loss of fidelity at finer joint articulation. Left-right symmetry is maintained throughout, meaning Code2Act does not introduce asymmetric gait artifacts.
 
-<Figure>
-  <Picture slot="figure" src={psdOverlay} alt="Power spectral density overlay for hind limb joints" />
-  <Fragment slot="caption">
-    **Power Spectral Density.** PSD overlay comparing Code2Act (blue) and Mimic-MJX (orange) for right hind limb joints during walking. Both share the dominant gait frequency, with hip showing closer spectral alignment than knee.
-  </Fragment>
-</Figure>
+<TwoColumns>
+  <Figure slot="left">
+    <Picture slot="figure" src={psdOverlayLeft} alt="PSD overlay for left hind limb joints" />
+    <Fragment slot="caption">
+      **Left hind limb.** PSD comparing Code2Act (blue, dashed) and Mimic-MJX (orange) during walking. Hip peaks align closely; knee shows broader divergence.
+    </Fragment>
+  </Figure>
+  <Figure slot="right">
+    <Picture slot="figure" src={psdOverlayRight} alt="PSD overlay for right hind limb joints" />
+    <Fragment slot="caption">
+      **Right hind limb.** Same pattern: dominant gait frequency preserved at hip, with expected fidelity loss at knee. Bilateral symmetry is maintained.
+    </Fragment>
+  </Figure>
+</TwoColumns>
 
 ### Behavioral Repertoire
 
