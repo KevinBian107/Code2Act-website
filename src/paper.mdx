@@ -211,14 +211,14 @@ We fit generative models (empirical transition matrix, HMM, ARHMM) to KPMS code 
 
 <Video src="code_generation_baselines_triptych.mp4" />
 
-**Baseline comparison.** Code sequences generated from baseline models compared against Code2Act, demonstrating the quality of behavior generation across different generative modeling approaches.
+**Baseline comparison.** Code sequences generated from baseline models compared against Code2Act. The baseline, given random code sequences, produces no meaningful movement, confirming that coherent behavior requires structured code sequences rather than arbitrary syllable inputs.
 
-To quantify the quality of generated behavior, we compute Kernel Inception Distance (KID) using a VAE trained on real mocap trajectories as a feature extractor. KID measures how closely the distribution of generated behavior matches real behavior in this learned feature space. Code2Act with real KPMS codes achieves the lowest KID, while generative code models (ARHMM, transition matrix) introduce additional distributional shift from sampling in code space rather than replaying recorded sequences.
+To quantify how realistic the generated behavior is, we compute Kernel Inception Distance (KID), which measures how closely generated behavior matches real behavior in the feature space of a VAE trained on Mimic-MJX trajectories. All three generative approaches achieve low KID, confirming that planning in syllable space produces distributionally realistic whole-body behavior regardless of the code generation strategy.
 
 <Figure>
   <Picture slot="figure" src={kidBarplot} alt="KID comparison across methods" />
   <Fragment slot="caption">
-    **Kernel Inception Distance.** Lower is better. Code2Act with real KPMS codes produces behavior closest to the real distribution. ARHMM and transition matrix models generate plausible code sequences but introduce distributional shift. Error bars = std across 3 VAE seeds; 200-frame clips.
+    **Kernel Inception Distance.** Lower is better. All conditions produce behavior distributionally close to real. Error bars = std across 3 VAE seeds; 200-frame clips.
   </Fragment>
 </Figure>
 
