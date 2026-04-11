@@ -59,7 +59,7 @@ import paradeTrail from "./assets/parade_trail_rwg.png";
 import triptychTrailLow from "./assets/behavior_triptych_trail_low_v2.png";
 import psdOverlayLeft from "./assets/psd_overlay_left.png";
 import psdOverlayRight from "./assets/psd_overlay_right_v2.png";
-import hiddenScatter from "./assets/hidden_scatter_pca3d.png";
+
 
 <HighlightedSection>
 
@@ -147,12 +147,9 @@ Code2Act also reproduces the fine temporal structure of locomotion. The power sp
 
 Although individual syllable codes do not map one-to-one to pure behaviors — they are learned from continuous reference data — the RNN decoder learns distinct dynamical regimes per syllable. PCA of the GRU hidden state reveals that walking codes drive extended, looping trajectories through hidden state space reflecting rhythmic gait cycles; immobility codes collapse to a tight, low-variance region; and rearing codes trace compact arcs corresponding to transient lift-and-hold dynamics. These trajectories occupy separable regions of hidden state space, confirming that the decoder internalizes qualitatively different dynamics per syllable rather than routing all behaviors through a shared dynamical regime.
 
-<Figure>
-  <Picture slot="figure" src={hiddenScatter} alt="PCA of RNN hidden state per behavior" />
-  <Fragment slot="caption">
-    **Within-syllable hidden state dynamics.** 3D PCA of GRU hidden states across K=10 rollouts per behavior, projected onto shared principal components. Walking codes produce extended trajectories reflecting rhythmic gait dynamics; immobility codes collapse to a compact cluster; rearing codes trace transient arcs. Each behavior occupies a distinct region of hidden state space.
-  </Fragment>
-</Figure>
+<Video src="hidden_dynamics_triptych.mp4" />
+
+**Within-syllable hidden state dynamics.** Left: 3D PCA of GRU hidden states progressing in sync with the rollout, rotating to reveal the structure. Right: 10 bodies per code, all starting from random poses. Each KPMS code is held constant for 250 frames. Walking codes (orange) drive extended, looping trajectories through hidden state space; immobility codes (blue) converge to a compact cluster; rearing codes (green) trace distinct arcs. Despite starting from diverse initial conditions, trajectories under the same code converge to the same region, showing that each code activates a reproducible motor program in the recurrent hidden state.
 
 ### Behavioral Repertoire
 
