@@ -59,6 +59,7 @@ import paradeTrail from "./assets/parade_trail_rwg.png";
 import triptychTrailLow from "./assets/behavior_triptych_trail_low_v2.png";
 import psdOverlayLeft from "./assets/psd_overlay_left.png";
 import psdOverlayRight from "./assets/psd_overlay_right_v2.png";
+import syllableGrid from "./assets/syllable_trajectory_grid.png";
 
 
 <HighlightedSection>
@@ -143,7 +144,16 @@ The behavior parade shows the full repertoire that Code2Act produces. All bodies
 
 ### From Syllables to Behavior
 
-KPMS segments behavior into fine-grained syllables because it can only decompose what is present in the data &mdash; brief, overlapping motion fragments. With a generative controller like Code2Act, we can hold a single code constant and observe its effect in isolation (see [Within-Syllable Hidden Dynamics](#within-syllable-hidden-dynamics) for the corresponding hidden state video). This reveals that each code drives only a single type of motion &mdash; a repetitive gait cycle, a static hold, or a brief postural shift &mdash; rather than the diverse repertoire that real animals produce. Coherent behavioral sequences emerge only when codes compose over time, with transitions between codes creating the richness of naturalistic movement.
+KPMS segments behavior into fine-grained syllables because it can only decompose what is present in the data &mdash; brief, overlapping motion fragments. The syllable trajectory grid below illustrates this: each syllable captures a short, stereotyped motion primitive (a stride fragment, a head turn, a postural shift) rather than a complete behavior.
+
+<Figure>
+  <Picture slot="figure" src={syllableGrid} alt="KPMS syllable trajectory grid" />
+  <Fragment slot="caption">
+    **KPMS Syllable Trajectories.** Top-down (XY) and side (XZ) projections of keypoint trajectories for each syllable, showing the fine-grained motion primitives that KPMS extracts from continuous behavior. Each syllable captures a brief, stereotyped motif.
+  </Fragment>
+</Figure>
+
+With a generative controller like Code2Act, we can hold a single code constant and observe its effect in isolation (see [Within-Syllable Hidden Dynamics](#within-syllable-hidden-dynamics) for the corresponding hidden state video). This reveals that each code drives only a single type of motion &mdash; a repetitive gait cycle, a static hold, or a brief postural shift &mdash; rather than the diverse repertoire that real animals produce. Coherent behavioral sequences emerge only when codes compose over time, with transitions between codes creating the richness of naturalistic movement.
 
 Providing walk codes produces walking, immobility codes produce stillness, and rear codes produce rearing, regardless of the starting pose. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
 
