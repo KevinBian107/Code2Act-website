@@ -126,31 +126,6 @@ Code2Act achieves strong imitation from coarse syllable information alone. Given
   </Fragment>
 </Figure>
 
-Code2Act also reproduces the fine temporal structure of locomotion. The power spectral density of hind limb joint angles during walking reveals that Code2Act captures the dominant ~2 Hz gait frequency of Mimic-MJX bilaterally, confirming the decoder preserves the fundamental locomotion rhythm from coarse syllable codes alone. Proximal joints (hip) show tight spectral overlap on both sides, while distal joints (knee) show more divergence, with Code2Act slightly underestimating peak power. This indicates that coarse locomotion dynamics are captured faithfully, with expected loss of fidelity at finer joint articulation. Left-right symmetry is maintained throughout, meaning Code2Act does not introduce asymmetric gait artifacts.
-
-<TwoColumns>
-  <Figure slot="left">
-    <Picture slot="figure" src={psdOverlayLeft} alt="PSD overlay for left hind limb joints" />
-    <Fragment slot="caption">
-      **Left hind limb.** PSD comparing Code2Act (blue, dashed) and Mimic-MJX (orange) during walking. Hip peaks align closely; knee shows broader divergence.
-    </Fragment>
-  </Figure>
-  <Figure slot="right">
-    <Picture slot="figure" src={psdOverlayRight} alt="PSD overlay for right hind limb joints" />
-    <Fragment slot="caption">
-      **Right hind limb.** Same pattern: dominant gait frequency preserved at hip, with expected fidelity loss at knee. Bilateral symmetry is maintained.
-    </Fragment>
-  </Figure>
-</TwoColumns>
-
-### Within-Syllable Dynamics
-
-Although individual syllable codes do not map one-to-one to pure behaviors — they are learned from continuous reference data — the RNN decoder learns distinct dynamical regimes per syllable. PCA of the GRU hidden state reveals that walking codes drive extended, looping trajectories through hidden state space reflecting rhythmic gait cycles; immobility codes collapse to a tight, low-variance region; and rearing codes trace compact arcs corresponding to transient lift-and-hold dynamics. These trajectories occupy separable regions of hidden state space, confirming that the decoder internalizes qualitatively different dynamics per syllable rather than routing all behaviors through a shared dynamical regime.
-
-<Video src="hidden_dynamics_triptych.mp4" />
-
-**Within-syllable hidden state dynamics.** Left: 3D PCA of GRU hidden states progressing in sync with the rollout, rotating to reveal the structure. Right: 10 bodies per code, all starting from random poses. Each KPMS code is held constant for 250 frames. Walking codes (orange) drive extended, looping trajectories through hidden state space; immobility codes (blue) converge to a compact cluster; rearing codes (green) trace distinct arcs. Despite starting from diverse initial conditions, trajectories under the same code converge to the same region, showing that each code activates a reproducible motor program in the recurrent hidden state.
-
 ### Behavioral Repertoire
 
 The behavior parade shows the full repertoire that Code2Act produces. All bodies receive the same code sequence (walk &rarr; immobility &rarr; rear) but start from different poses, demonstrating consistent, biomechanically realistic dynamics regardless of initial conditions.
@@ -220,6 +195,31 @@ The kinematic signatures below quantify the behavioral differences produced by e
 </TwoColumns>
 
 Walk codes (orange) produce large XY displacement; rear codes (green) show distinct vertical dynamics; immobility codes (blue) remain stationary. Mean &plusmn; SEM across surviving trajectories.
+
+Code sequences are instructional at both coarse and fine scales: specified sequences produce expected behavior profiles (e.g., greater root displacement for walking codes) as well as Mimic-MJX's dominant gait frequency across hind limb joints in walking clips. The power spectral density of hind limb joint angles shows that Code2Act captures the dominant ~2 Hz gait frequency bilaterally, with proximal joints (hip) showing tight spectral overlap and distal joints (knee) showing expected divergence.
+
+<TwoColumns>
+  <Figure slot="left">
+    <Picture slot="figure" src={psdOverlayLeft} alt="PSD overlay for left hind limb joints" />
+    <Fragment slot="caption">
+      **Left hind limb.** PSD comparing Code2Act (blue, dashed) and Mimic-MJX (orange) during walking. Hip peaks align closely; knee shows broader divergence.
+    </Fragment>
+  </Figure>
+  <Figure slot="right">
+    <Picture slot="figure" src={psdOverlayRight} alt="PSD overlay for right hind limb joints" />
+    <Fragment slot="caption">
+      **Right hind limb.** Same pattern: dominant gait frequency preserved at hip, with expected fidelity loss at knee. Bilateral symmetry is maintained.
+    </Fragment>
+  </Figure>
+</TwoColumns>
+
+### Within-Syllable Dynamics
+
+Although individual syllable codes do not map one-to-one to pure behaviors &mdash; they are learned from continuous reference data &mdash; the RNN decoder learns distinct dynamical regimes per syllable. PCA of the GRU hidden state reveals that walking codes drive extended, looping trajectories through hidden state space reflecting rhythmic gait cycles; immobility codes collapse to a tight, low-variance region; and rearing codes trace compact arcs corresponding to transient lift-and-hold dynamics. These trajectories occupy separable regions of hidden state space, confirming that the decoder internalizes qualitatively different dynamics per syllable rather than routing all behaviors through a shared dynamical regime.
+
+<Video src="hidden_dynamics_triptych.mp4" />
+
+**Within-syllable hidden state dynamics.** Left: 3D PCA of GRU hidden states progressing in sync with the rollout, rotating to reveal the structure. Right: 10 bodies per code, all starting from random poses. Each KPMS code is held constant for 250 frames. Walking codes (orange) drive extended, looping trajectories through hidden state space; immobility codes (blue) converge to a compact cluster; rearing codes (green) trace distinct arcs. Despite starting from diverse initial conditions, trajectories under the same code converge to the same region, showing that each code activates a reproducible motor program in the recurrent hidden state.
 
 ### Planning in Syllable Space
 
