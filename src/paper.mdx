@@ -61,6 +61,7 @@ import psdOverlayLeft from "./assets/psd_overlay_left.png";
 import psdOverlayRight from "./assets/psd_overlay_right_v2.png";
 import syllableGrid from "./assets/syllable_trajectory_grid.png";
 import kidGeneralization from "./assets/kid_generalization.png";
+import kidRolloutLength from "./assets/kid_rollout_length.png";
 
 
 <HighlightedSection>
@@ -219,23 +220,22 @@ To quantify how realistic the generated behavior is, we compute Kernel Inception
 
 ### Generalization to Unseen Data
 
-The results above were evaluated on the training distribution. A critical test is whether Code2Act generalizes to entirely new behavioral recordings that neither the decoder nor KPMS have seen during training. We sampled 20 long segments (2000 frames each) from a held-out continuous recording, extracted KPMS syllable codes from the new data, and ran both Code2Act and Mimic-MJX on the same segments.
+The results above were evaluated on the training distribution. A critical test is whether Code2Act generalizes to entirely new behavioral recordings that neither the decoder nor KPMS have seen during training. We sampled 20 long segments from a held-out continuous recording, extracted KPMS syllable codes from the new data, and ran both Code2Act and Mimic-MJX on the same segments.
 
-<div class="flex w-full flex-wrap items-center gap-4">
-  <div class="min-w-[20rem]" style="flex: 3;">
-    <Video src="generalization_triptych.mp4" />
-  </div>
-  <div class="min-w-[10rem]" style="flex: 1;">
-    <Figure>
-      <Picture slot="figure" src={kidGeneralization} alt="Generalization KID comparison" />
-      <Fragment slot="caption">
-        **Generalization KID.** Lower is better. Error bars = std across 3 VAE seeds.
-      </Fragment>
-    </Figure>
-  </div>
-</div>
+<Video src="generalization_triptych.mp4" />
 
-**Generalization comparison.** Real reference trajectories (left), Mimic-MJX (center), and Code2Act (right) on unseen continuous data, with 10 ghost bodies per panel. Code2Act (KID = 0.89) produces behavior closer to the training distribution than Mimic-MJX (KID = 1.32), despite operating from discrete syllable codes rather than full reference trajectories. The discrete syllable interface provides a natural abstraction for generalization: as long as new behavior decomposes into the same syllable vocabulary, Code2Act maps each code to its learned motor program. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
+**Generalization comparison.** Real reference trajectories (left), Mimic-MJX (center), and Code2Act (right) on unseen continuous data, with 10 ghost bodies per panel. Code2Act generates behavior from KPMS syllable codes alone, without access to the reference trajectory.
+
+To quantify generalization, we computed KID against the training distribution at three rollout lengths (500, 1000, and 2000 frames). Code2Act consistently produces behavior closer to real than Mimic-MJX across all durations.
+
+<Figure>
+  <Picture slot="figure" src={kidRolloutLength} alt="KID across rollout lengths" />
+  <Fragment slot="caption">
+    **Generalization KID across rollout lengths.** Lower is better. Code2Act (light blue) outperforms Mimic-MJX (dark blue) at all three durations. Error bars = std across 3 VAE seeds.
+  </Fragment>
+</Figure>
+
+The gap between Code2Act and Mimic-MJX widens at longer rollouts. This is expected: Mimic-MJX was trained on 500-frame clips, so at the training length (500 frames) both methods perform similarly. As rollouts extend beyond the training horizon, Mimic-MJX must track novel reference trajectories frame-by-frame and accumulates drift at clip boundaries, while Code2Act's discrete syllable interface provides a natural abstraction &mdash; as long as new behavior decomposes into the same syllable vocabulary, each code maps to its learned motor program regardless of duration. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
 
 ## Conclusion
 
