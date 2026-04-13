@@ -60,6 +60,7 @@ import triptychTrailLow from "./assets/behavior_triptych_trail_low_v2.png";
 import psdOverlayLeft from "./assets/psd_overlay_left.png";
 import psdOverlayRight from "./assets/psd_overlay_right_v2.png";
 import syllableGrid from "./assets/syllable_trajectory_grid.png";
+import kidGeneralization from "./assets/kid_generalization.png";
 
 
 <HighlightedSection>
@@ -144,69 +145,31 @@ The behavior parade shows the full repertoire that Code2Act produces. All bodies
 
 ### From Syllables to Behavior
 
-KPMS segments behavior into fine-grained syllables because it can only decompose what is present in the data &mdash; brief, overlapping motion fragments. The syllable trajectory grid below illustrates this: each syllable captures a short, stereotyped motion primitive (a stride fragment, a head turn, a postural shift) rather than a complete behavior.
+Keypoint-MoSeq (KPMS) discovers a vocabulary of behavioral syllables directly from data &mdash; not coarse human labels like "walking" or "grooming," but fine-grained, sub-second motifs: a single stride fragment, a head turn, a subtle postural shift. On their own, these syllables are abstract &mdash; short segments in a statistical decomposition. Code2Act makes them *tangible*. By feeding a single syllable code into the embodied controller and holding it constant, we can watch what that syllable actually *does* to a physically simulated body. A code that appeared as a brief cluster boundary in KPMS becomes a sustained gait cycle, a stable postural hold, or a rhythmic head movement playing out in real physics (see [Within-Syllable Hidden Dynamics](#within-syllable-hidden-dynamics) for the corresponding internal state trajectories).
 
-<Figure>
-  <Picture slot="figure" src={syllableGrid} alt="KPMS syllable trajectory grid" />
-  <Fragment slot="caption">
-    **KPMS Syllable Trajectories.** Top-down (XY) and side (XZ) projections of keypoint trajectories for each syllable, showing the fine-grained motion primitives that KPMS extracts from continuous behavior. Each syllable captures a brief, stereotyped motif.
-  </Fragment>
-</Figure>
-
-With a generative controller like Code2Act, we can hold a single code constant and observe its effect in isolation (see [Within-Syllable Hidden Dynamics](#within-syllable-hidden-dynamics) for the corresponding hidden state video). This reveals that each code drives only a single type of motion &mdash; a repetitive gait cycle, a static hold, or a brief postural shift &mdash; rather than the diverse repertoire that real animals produce. Coherent behavioral sequences emerge only when codes compose over time, with transitions between codes creating the richness of naturalistic movement.
-
-Providing walk codes produces walking, immobility codes produce stillness, and rear codes produce rearing, regardless of the starting pose. The ghost-body videos below show multiple trajectories overlaid, all driven by the same behavioral code sequence but from different initial conditions.
+The ghost-body video below shows this: multiple trajectories overlaid, all driven by the same behavioral code but from different initial conditions. Each code reliably produces its characteristic motor pattern regardless of starting pose.
 
 <Video src="behavior_triptych_low.mp4" />
 
-**Walk Pose Instantiation.** K=6 trajectories per behavior (Immobility | Walk | Rear), all initialized from a walk-like starting pose. The decoder produces behavior-appropriate dynamics regardless of initial pose.
-
-<Video src="behavior_triptych_high.mp4" />
-
-**Rear Pose Instantiation.** K=6 trajectories per behavior (Immobility | Walk | Rear), all initialized from a rear-like starting pose. Each colored body is an independent rollout driven by the same KPMS code sequence.
+**Behavior Instantiation.** K=6 trajectories per behavior (Immobility | Walk | Rear), all from the same starting pose. Each colored body is an independent rollout driven by the same KPMS code sequence.
 
 <Figure>
-  <Picture slot="figure" src={triptychTrailLow} alt="Behavior triptych motion trails from walk pose" />
+  <Picture slot="figure" src={triptychTrailLow} alt="Behavior triptych motion trails" />
   <Fragment slot="caption">
-    **Walk Pose Motion Trails.** Frozen-copy trails for each behavior (Immobility | Walk | Rear), all from the same walk-like initial pose. Walk codes produce extended forward trajectories, immobility codes remain stationary, and rear codes show vertical displacement with minimal horizontal drift.
+    **Motion Trails.** Frozen-copy trails for each behavior (Immobility | Walk | Rear). Walk codes produce extended forward trajectories, immobility codes remain stationary, and rear codes show vertical displacement with minimal horizontal drift.
   </Fragment>
 </Figure>
 
-The kinematic signatures below quantify the behavioral differences produced by each code category. Walk codes produce the highest XY speed and joint activity across both forelimbs and hindlimbs; rear codes produce the highest vertical posture with strong hindlimb drive; immobility codes remain stationary with minimal joint movement in all limbs. This pattern holds across both starting pose conditions, confirming that syllable codes are **instructional**, reliably driving distinct motor dynamics regardless of starting state.
+But individual syllables only tell part of the story. Real behavior is a *conversation* &mdash; a fluid sequence of syllables, not a single repeated word. When we feed Code2Act a natural sequence of KPMS codes extracted from real data, the transitions between syllables produce coherent, naturalistic movement: a walk that slows into a pause, a postural shift that flows into grooming. The kinematic signatures below confirm that code sequences are instructional at both coarse and fine scales, with each syllable category driving distinct motor dynamics across limbs.
 
-<TwoColumns>
-  <Figure slot="left">
-    <Picture slot="figure" src={kinematicSigLow} alt="Kinematic signatures from walk pose" />
-    <Fragment slot="caption">
-      **Walk pose instantiation.** Violin plots of XY speed, root Z height, and forelimb/hindlimb angular velocity (shoulder/elbow/wrist vs hip/knee/ankle) per behavior. Individual dots = per-clip values.
-    </Fragment>
-  </Figure>
-  <Figure slot="right">
-    <Picture slot="figure" src={kinematicSigHigh} alt="Kinematic signatures from rear pose" />
-    <Fragment slot="caption">
-      **Rear pose instantiation.** Same metrics from a rear-like starting pose. The pattern holds: walk codes produce the highest locomotion and joint activity, immobility codes remain still, and rear codes drive vertical posture with strong hindlimb engagement.
-    </Fragment>
-  </Figure>
-</TwoColumns>
+<Figure>
+  <Picture slot="figure" src={kinematicSigLow} alt="Kinematic signatures" />
+  <Fragment slot="caption">
+    **Kinematic Signatures.** Violin plots of XY speed, root Z height, and forelimb/hindlimb angular velocity per behavior. Walk codes produce the highest locomotion and joint activity; rear codes drive vertical posture with strong hindlimb engagement; immobility codes remain stationary. Individual dots = per-clip values.
+  </Fragment>
+</Figure>
 
-<TwoColumns>
-  <Figure slot="left">
-    <Picture slot="figure" src={displacementHigh} alt="Code sequence displacement from rear pose" />
-    <Fragment slot="caption">
-      **Rear pose initialization.** Vertical (&Delta;z) and horizontal (&Delta;xy) displacement.
-    </Fragment>
-  </Figure>
-  <Figure slot="right">
-    <Picture slot="figure" src={displacementLow} alt="Code sequence displacement from walk pose" />
-    <Fragment slot="caption">
-      **Walk pose initialization.** Vertical (&Delta;z) and horizontal (&Delta;xy) displacement.
-    </Fragment>
-  </Figure>
-</TwoColumns>
-
-Walk codes (orange) produce large XY displacement; rear codes (green) show distinct vertical dynamics; immobility codes (blue) remain stationary. Mean &plusmn; SEM across surviving trajectories.
-
-Code sequences are instructional at both coarse and fine scales: specified sequences produce expected behavior profiles (e.g., greater root displacement for walking codes) as well as Mimic-MJX's dominant gait frequency across hind limb joints in walking clips. The power spectral density of hind limb joint angles shows that Code2Act captures the dominant ~2 Hz gait frequency bilaterally, with proximal joints (hip) showing tight spectral overlap and distal joints (knee) showing expected divergence.
+Code2Act also preserves the fine temporal structure of locomotion. The power spectral density of hind limb joint angles shows that Code2Act captures the dominant ~2 Hz gait frequency bilaterally, with proximal joints (hip) showing tight spectral overlap with Mimic-MJX and distal joints (knee) showing expected divergence.
 
 <TwoColumns>
   <Figure slot="left">
@@ -253,6 +216,26 @@ To quantify how realistic the generated behavior is, we compute Kernel Inception
     **Distribution Quality: Real vs Generated Behavior.** KID (lower is better) comparing Code2Act with actual KPMS codes, transition matrix sampling, ARHMM generation, and random codes. All structured code generation methods produce behavior distributionally close to real, while random codes diverge sharply. Error bars = std across 3 VAE seeds; 200-frame clips.
   </Fragment>
 </Figure>
+
+### Generalization to Unseen Data
+
+The results above were evaluated on the training distribution. A critical test is whether Code2Act generalizes to entirely new behavioral recordings that neither the decoder nor KPMS have seen during training. We sampled 20 long segments (2000 frames each) from a held-out continuous recording, extracted KPMS syllable codes from the new data, and ran both Code2Act and Mimic-MJX on the same segments.
+
+<div class="flex w-full flex-wrap items-center gap-4">
+  <div class="min-w-[20rem]" style="flex: 3;">
+    <Video src="generalization_triptych.mp4" />
+  </div>
+  <div class="min-w-[10rem]" style="flex: 1;">
+    <Figure>
+      <Picture slot="figure" src={kidGeneralization} alt="Generalization KID comparison" />
+      <Fragment slot="caption">
+        **Generalization KID.** Lower is better. Error bars = std across 3 VAE seeds.
+      </Fragment>
+    </Figure>
+  </div>
+</div>
+
+**Generalization comparison.** Real reference trajectories (left), Mimic-MJX (center), and Code2Act (right) on unseen continuous data, with 10 ghost bodies per panel. Code2Act (KID = 0.89) produces behavior closer to the training distribution than Mimic-MJX (KID = 1.32), despite operating from discrete syllable codes rather than full reference trajectories. The discrete syllable interface provides a natural abstraction for generalization: as long as new behavior decomposes into the same syllable vocabulary, Code2Act maps each code to its learned motor program. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
 
 ## Conclusion
 
