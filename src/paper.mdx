@@ -235,7 +235,7 @@ To quantify generalization, we computed KID against the training distribution at
   </Fragment>
 </Figure>
 
-The gap between Code2Act and Mimic-MJX widens at longer rollouts. This is expected: Mimic-MJX was trained on 500-frame clips, so at the training length (500 frames) both methods perform similarly. As rollouts extend beyond the training horizon, Mimic-MJX must track novel reference trajectories frame-by-frame and accumulates drift at clip boundaries, while Code2Act's discrete syllable interface provides a natural abstraction &mdash; as long as new behavior decomposes into the same syllable vocabulary, each code maps to its learned motor program regardless of duration. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
+The gap between Code2Act and Mimic-MJX widens at longer rollouts. This is expected: Mimic-MJX was trained on 250-frame clips, so as rollouts extend beyond the training horizon, it must track novel reference trajectories frame-by-frame and accumulates drift at clip boundaries. Code2Act's discrete syllable interface provides a natural abstraction &mdash; as long as new behavior decomposes into the same syllable vocabulary, each code maps to its learned motor program regardless of duration. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
 
 ## Conclusion
 
