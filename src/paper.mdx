@@ -226,16 +226,16 @@ The results above were evaluated on the training distribution. A critical test i
 
 **Generalization comparison.** Real reference trajectories (left), Mimic-MJX (center), and Code2Act (right) on unseen continuous data, with 10 ghost bodies per panel. Code2Act generates behavior from KPMS syllable codes alone, without access to the reference trajectory.
 
-To quantify generalization, we computed KID against the training distribution at four rollout lengths (250, 500, 1000, and 2000 frames), where 250 frames is the training clip length.
+To quantify this, we trained two VAE feature extractors &mdash; one on training-data mimic rollouts and one on testing-data mimic rollouts &mdash; and computed KID at four rollout lengths (250, 500, 1000, and 2000 frames). The three panels below show complementary views of the same experiment.
 
 <Figure>
   <Picture slot="figure" src={kidRolloutLength} alt="KID across rollout lengths" />
   <Fragment slot="caption">
-    **Generalization KID across rollout lengths.** Lower is better. Code2Act (light blue) outperforms Mimic-MJX (dark blue) at all four durations. Error bars = std across 3 VAE seeds.
+    **Generalization KID across rollout lengths.** Lower is better. Dark blue = Mimic-MJX, light blue = Code2Act. Left: in-distribution baseline (training rollouts evaluated against training-data VAE) &mdash; both methods perform near the noise floor. Middle: generalization rollouts against training-data VAE &mdash; Code2Act is consistently closer to the training distribution. Right: generalization rollouts against testing-data VAE &mdash; Mimic-MJX is closer to its own generalization distribution (as expected), but Code2Act follows a similar scaling trend. Error bars = std across 3 VAE seeds.
   </Fragment>
 </Figure>
 
-Code2Act outperforms Mimic-MJX at every rollout length, and the gap widens monotonically with duration. At the training clip length (250 frames), both methods are closest in performance, but as rollouts extend beyond the training horizon, Mimic-MJX accumulates drift at clip boundaries &mdash; it must track novel reference trajectories frame-by-frame and has no mechanism for long-range coherence. Code2Act's discrete syllable interface provides a natural abstraction: as long as new behavior decomposes into the same syllable vocabulary, each code maps to its learned motor program regardless of duration. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
+On training data (left panel), both methods reproduce the reference distribution near the noise floor &mdash; this confirms both policies are well-trained. On generalization data (middle panel), Code2Act outperforms Mimic-MJX at every rollout length, and the gap widens with duration. This is because Mimic-MJX was trained on 250-frame clips: as rollouts extend beyond this horizon, it accumulates drift at clip boundaries. Code2Act's discrete syllable interface provides a natural abstraction &mdash; each code maps to its learned motor program regardless of duration. The right panel provides a complementary view: when the VAE is trained on generalization-data mimic rollouts, Mimic-MJX is naturally closer to its own distribution, but Code2Act tracks a similar scaling trend, confirming that the syllable bottleneck produces behaviorally coherent motion even on unseen data.
 
 ## Conclusion
 
