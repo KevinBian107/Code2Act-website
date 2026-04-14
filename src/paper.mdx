@@ -226,16 +226,16 @@ The results above were evaluated on the training distribution. A critical test i
 
 **Generalization comparison.** Real reference trajectories (left), Mimic-MJX (center), and Code2Act (right) on unseen continuous data, with 10 ghost bodies per panel. Code2Act generates behavior from KPMS syllable codes alone, without access to the reference trajectory.
 
-To quantify generalization, we computed KID against the training distribution at three rollout lengths (500, 1000, and 2000 frames). Code2Act consistently produces behavior closer to real than Mimic-MJX across all durations.
+To quantify generalization, we computed KID against the training distribution at four rollout lengths (250, 500, 1000, and 2000 frames), where 250 frames is the training clip length.
 
 <Figure>
   <Picture slot="figure" src={kidRolloutLength} alt="KID across rollout lengths" />
   <Fragment slot="caption">
-    **Generalization KID across rollout lengths.** Lower is better. Code2Act (light blue) outperforms Mimic-MJX (dark blue) at all three durations. Error bars = std across 3 VAE seeds.
+    **Generalization KID across rollout lengths.** Lower is better. Code2Act (light blue) outperforms Mimic-MJX (dark blue) at all four durations. Error bars = std across 3 VAE seeds.
   </Fragment>
 </Figure>
 
-The gap between Code2Act and Mimic-MJX widens at longer rollouts. This is expected: Mimic-MJX was trained on 250-frame clips, so as rollouts extend beyond the training horizon, it must track novel reference trajectories frame-by-frame and accumulates drift at clip boundaries. Code2Act's discrete syllable interface provides a natural abstraction &mdash; as long as new behavior decomposes into the same syllable vocabulary, each code maps to its learned motor program regardless of duration. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
+Code2Act outperforms Mimic-MJX at every rollout length, and the gap widens monotonically with duration. At the training clip length (250 frames), both methods are closest in performance, but as rollouts extend beyond the training horizon, Mimic-MJX accumulates drift at clip boundaries &mdash; it must track novel reference trajectories frame-by-frame and has no mechanism for long-range coherence. Code2Act's discrete syllable interface provides a natural abstraction: as long as new behavior decomposes into the same syllable vocabulary, each code maps to its learned motor program regardless of duration. The syllable bottleneck, rather than limiting expressiveness, acts as a regularizer that enables robust transfer to new behavioral contexts.
 
 ## Conclusion
 
