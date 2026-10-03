@@ -1,0 +1,199 @@
+import { Image } from "astro:assets";
+import Wide from "./components/Wide.astro";
+import PipelineExplorer from "./components/interactive/PipelineExplorer.tsx";
+import AtlasGallery from "./components/interactive/AtlasGallery.tsx";
+import SequenceViewer from "./components/interactive/SequenceViewer.tsx";
+import HiddenPCA3D from "./components/interactive/HiddenPCA3D.tsx";
+import RoundTripExplorer from "./components/interactive/RoundTripExplorer.tsx";
+import KickViewer from "./components/interactive/KickViewer.tsx";
+import PairExplorer from "./components/interactive/PairExplorer.tsx";
+import atlas from "./data/atlas.json";
+import sequences from "./data/sequences.json";
+import roundtrip from "./data/roundtrip.json";
+import roundtripBars from "./data/roundtrip_bars.json";
+import kick from "./data/kick.json";
+import perturbation from "./data/perturbation.json";
+import pairs from "./data/pairs.json";
+import transitions from "./data/transitions.json";
+import dsaBody from "./assets/figures/dsa_body_mlb_sq.png";
+import dsaHidden from "./assets/figures/dsa_hidden_mlb_sq.png";
+import { MLB } from "./components/interactive/util";
+
+export const base = import.meta.env.BASE_URL;
+
+<h2 id="motivation">Behavior has names. Bodies need commands.</h2>
+
+Behavioral neuroscience and embodied AI both describe behavior with discrete vocabularies. Keypoint-MoSeq splits motion into syllables, pose classifiers assign discriminative classes, annotators write ethograms, and planners emit symbols. Over such a vocabulary, planning and annotation become tractable. But none of these symbols can be *executed*: they describe recorded motion, and making a body perform one usually takes a hand-engineered controller or a policy trained, with its own reward, for that symbol alone.
+
+**Code2Act** closes that gap for the 38-actuator biomechanical rat of [MIMIC-MJX](https://mimic-mjx.talmolab.org/). One recurrent controller reads only a stream of symbols and the body's proprioception, and turns it into torques. Because the symbol stream is its only command input, a single training run covers an entire vocabulary, and the vocabulary can be swapped for any other labeling without changing the controller's design.
+
+On this page we walk through what the controller does, with the rollouts behind the paper's figures rendered as video and several of the analyses made interactive.
+
+<div class="not-prose my-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-[0.95rem] leading-relaxed text-zinc-700">
+  <b class="text-zinc-900">A note on the examples.</b> The video clips on this page are curated for the best visualization: from each set of rollouts we show an example chosen by a fixed rule, usually the clearest or best-recovering one, and each caption states that rule. The numbers are not curated. Tables, charts, round-trip bars and success rates use all rollouts, as in the paper.
+</div>
+
+<h2 id="method">How Code2Act works</h2>
+
+Code2Act is built in three stages, each run as its own process. A pretrained imitation model supplies both a privileged teacher and an inverse-dynamics decoder. A steering strategy assigns every reference frame a discrete symbol. And a recurrent controller learns, by reinforcement learning on its own rollouts, to reproduce the motor intention the imitation model would have produced from the full reference, while seeing only the symbols.
+
+<Wide n={1} title="The pipeline, stage by stage.">
+  <PipelineExplorer client:visible />
+  <Fragment slot="caption">
+    Pick a tab to light up the modules and data paths active in each stage. The symbol box cycles through real bout sequences of each vocabulary. In the controller the goal trajectory reaches only the frozen encoder, which supplies a stop-gradient KL target and never the action path.
+  </Fragment>
+</Wide>
+
+The key property comes from the pretrained latent. The imitation model's intention encodes the change the body must apply to reach the next pose *from its current state*, so no single intention can serve a symbol across every body state. One symbol therefore maps to many intention trajectories, each selected by the body's state at that moment. That is why a held symbol can reach the same motion from very different starting points, as the experiments below show.
+
+<h2 id="vocabularies">Three vocabularies, one controller</h2>
+
+We train the same controller design on three steering strategies (one training run each) that differ in where they come from and how large they are:
+
+- **KPMS**: unsupervised Keypoint-MoSeq syllables, *K* = 100. Usage is heavy-tailed; the 25 most-used syllables cover about 97% of frames.
+- **KVAE**: latents of a kinematics VAE on short pose windows, clustered with *K*-means into *K* = 25 codes.
+- **MLB**: nine manually labeled behaviors, Walk, Rear and Turn crossed with Left, Straight and Right, plus Immobile. MLB is written by hand and never fit to the controller, so it tests whether the structure comes from the construction rather than a data-tuned front end.
+
+Below, each code is held constant on one body.
+
+<Wide n={2} title="Every symbol, held.">
+  <AtlasGallery client:visible data={atlas} base={base} />
+  <Fragment slot="caption">
+    One body holds each code for six seconds, drawn as in the paper's codebook figures: the live body, a fading trail of its recent past, and its root path, colored by behavior (hue) and direction (shade). For each code we show the body whose motion the labeler reads as the code's most common behavior, and among those the one with the median path length. Click a clip to enlarge it. Several directional variants share a base motion, and Turn L is executed as a tightly curving left walk.
+  </Fragment>
+</Wide>
+
+Executed on the body, not every symbol is distinguishable. The nine MLB symbols steer to about five distinct behaviors: there are only about 100 labeled Walk R frames in the corpus, and a rear is the same movement whether it is labeled left or right. Keypoint-MoSeq is more redundant still, with usage concentrated on about 7 of its 100 syllables. Running a vocabulary on a body measures how many of its symbols correspond to distinct behaviors, a check the labels alone cannot provide.
+
+<h2 id="viewer">Steer it yourself</h2>
+
+The controller is not limited to holding one symbol. Chain symbols into a command stream and it moves between motor programs.
+
+<Wide n={3} title="Interactive sequence viewer.">
+  <SequenceViewer client:visible base={base} presets={sequences} />
+  <Fragment slot="caption">
+    Each preset chains MLB symbols into a command stream for the paper's MLB controller, running decoder-only from a test-set start pose. The <i>command</i> lane is the symbol stream; the <i>readout</i> lane is what the independent kinematic labeler reads from the motion. The right panel follows the controller's GRU state on the first two principal components of its states while each symbol is held (faint clouds), so you can watch the state leave one symbol's region and settle into the next. Drag the timeline to scrub. For each preset we rolled out 48 bodies from different start poses and show the one whose readout best matches the command; the agreement of the shown body and the median over all 48 are printed under the viewer.
+  </Fragment>
+</Wide>
+
+<h2 id="realism">Symbols steer realistic behavior</h2>
+
+Checking individual symbols is only meaningful if the controller's motion looks like a rat. We quantify realism with the kernel inception distance (KID) between controller rollouts and the expert MIMIC-MJX policy, computed in the feature space of a small VAE trained on expert motion. Each controller is driven by five code streams: its original codes, samples from the empirical transition matrix, two learned autoregressive priors (GPT and Mamba), and uniformly random codes.
+
+<div class="not-prose my-6 overflow-x-auto">
+<table class="mx-auto w-full max-w-3xl border-collapse text-center text-sm">
+  <caption class="mb-2 caption-top text-left text-sm text-zinc-500 italic"><b class="not-italic text-zinc-700 dark:text-zinc-200">Table 1.</b> KID to the expert policy (lower is better), mean ± std over three feature-extractor seeds. The expert's self-distance floor is about −0.1.</caption>
+  <thead>
+    <tr class="border-t-2 border-b border-zinc-800 dark:border-zinc-300"><th class="py-1.5 text-left">Steering strategy</th><th>Original</th><th>Transition</th><th>Mamba</th><th>GPT</th><th>Random</th></tr>
+  </thead>
+  <tbody class="tabular-nums">
+    <tr><td class="py-1.5 text-left">KPMS (<i>K</i> = 100)</td><td><b>0.251 ± 0.007</b></td><td>0.378 ± 0.012</td><td>0.298 ± 0.014</td><td>0.268 ± 0.014</td><td>0.664 ± 0.024</td></tr>
+    <tr><td class="py-1.5 text-left">KVAE (<i>K</i> = 25)</td><td>0.247 ± 0.031</td><td>0.266 ± 0.022</td><td>0.292 ± 0.026</td><td><b>0.244 ± 0.015</b></td><td>0.998 ± 0.099</td></tr>
+    <tr class="border-b-2 border-zinc-800 dark:border-zinc-300"><td class="py-1.5 text-left">MLB (<i>K</i> = 9)</td><td><b>0.162 ± 0.027</b></td><td>0.198 ± 0.036</td><td>0.246 ± 0.020</td><td>0.205 ± 0.037</td><td>0.729 ± 0.073</td></tr>
+  </tbody>
+</table>
+</div>
+
+Every structured stream reaches a KID far below the random stream of the same strategy, with the original codes at or near the lowest and the learned priors close behind: realism tracks the temporal structure of the symbol stream. This is a property of the motion distribution, so we report it as a table rather than as a single clip.
+
+<h2 id="dynamics">Inside the controller</h2>
+
+The body and the controller organize the same symbols differently. We compare per-symbol dynamics with dynamical similarity analysis (DSA), once on the body state and once on the GRU state. On the body, symbols separate cleanly: the three rears group with Immobile and the walks form their own block. Inside the controller the blocks blur, and the turns group with Walk R rather than with the other walks. This mirrors the data: in the corpus a turn is mostly a curving walk, and Walk R is the rarest symbol.
+
+<Wide n={4} title="Symbol dynamics on the body and in the controller.">
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div><Image src={dsaBody} alt="DSA distances between MLB symbols on the body state" class="w-full" /><div class="mt-1 text-center text-sm text-zinc-500">(a) body state</div></div>
+    <div><Image src={dsaHidden} alt="DSA distances between MLB symbols on the GRU state" class="w-full" /><div class="mt-1 text-center text-sm text-zinc-500">(b) controller (GRU) state</div></div>
+  </div>
+  <div class="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-zinc-600">
+    {MLB.map((m) => (
+      <span class="flex items-center gap-1.5"><span class="inline-block h-3 w-3 rounded-sm" style={{ background: `rgb(${m.color.map((c) => Math.round(c * 255)).join(",")})` }}></span>{m.name.replace("_", " ")}</span>
+    ))}
+  </div>
+  <Fragment slot="caption">
+    Pairwise DSA angular distance between per-symbol operators (the paper's Fig. 2a,b), each matrix reordered by clustering its own distances and drawn on its own color scale; the axis strips give each symbol's category. Behavior labels play no part in the ordering.
+  </Fragment>
+</Wide>
+
+The matrices summarize dynamics; the trajectories themselves are below. Each held symbol starts from a random pose, and the GRU state travels into a region of its own.
+
+<Wide n={5} title="The hidden-state progression, in 3D.">
+  <HiddenPCA3D client:only="react" base={base} />
+  <Fragment slot="caption">
+    GRU-state trajectories of the MLB controller holding each symbol, projected on the first three principal components. Press play, or drag the slider, to grow every trajectory from its start pose; drag the plot to rotate it. Click a symbol to hide it, or double-click to show it alone.
+  </Fragment>
+</Wide>
+
+<h2 id="roundtrip">The same symbol, from anywhere</h2>
+
+A symbolic layer needs each symbol to mean the same behavior whenever it is issued, from whatever state the body is in. A symbol that merely replayed a stored trajectory would work from one start pose. Because each symbol is defined outside the controller, re-labeling the motion it produces scores the controller against a criterion it was never trained on. We hold each symbol from 60 start poses and let the strategy's own labeler read the motion back.
+
+<Wide n={6} title="Round trip: command a symbol, read it back.">
+  <RoundTripExplorer client:visible base={base} clips={roundtrip} bars={roundtripBars} />
+  <Fragment slot="caption">
+    Left: four of the 60 start poses for the selected MLB symbol (a seeded random draw), with the readout the round trip assigns to each. Right: each commanded symbol's readouts split into the symbol itself, the same behavior in another direction, and a different behavior; the most common wrong destination is printed for large error segments. Switch strategies to compare KPMS and KVAE, which are read back by their own tokenizers.
+  </Fragment>
+</Wide>
+
+For MLB the commanded symbol is recovered in 48% of instantiations and its behavior in 69%, against chance levels of 11% and 25%. Most of the shortfall is the directional collapse seen above: 8 of the 9 symbols place their most common readout inside the correct behavior. The exception, Turn L, reads as Walk L in 98% of instantiations, which makes it the most consistent symbol in the codebook, executed as a curving walk.
+
+<h2 id="perturbation">Kick it, and it comes back</h2>
+
+The round trip only varies the start pose. We also perturb the body during execution: after it settles under a held symbol, a single-step velocity impulse of scale *a* hits it, and the controller, still reading only the symbol, has to bring it back.
+
+<Wide n={7} title="Kick and recovery.">
+  <KickViewer client:visible base={base} clips={kick} curves={{ mlb: perturbation.mlb }} />
+  <Fragment slot="caption">
+    The MLB controller. Left: one body and its unperturbed twin from the same start pose, holding Rear R or Walk L, kicked at the impulse size you pick. The kicked body flashes red at the impulse and fades back as it recovers. For each impulse size we show the best-recovering of 48 bodies: for the rear, among bodies that took at least a median-sized shove, the one whose posture ends closest to its twin's; for the walk, among bodies walking steadily through their last three seconds, the one closest to its twin's pace. Right: the share of the impulse-induced displacement that has decayed five seconds later, and the pose deviation from unperturbed rollouts against the unperturbed floor (dotted) and the distance between different symbols (dashed), averaged by behavior over all 48 bodies per symbol.
+  </Fragment>
+</Wide>
+
+Five seconds after the impulse, 85% (MLB), 92% (KPMS) and 74% (KVAE) of the induced displacement has decayed on average, with little dependence on impulse size. Across a 6.7-fold range of impulse, MLB's peak displacement grows 7.9-fold but its final displacement only 2.0-fold. The deviation from unperturbed motion grows with the impulse yet stays below the distance between distinct symbols for every behavior at *a* = 0.6. For MLB, rears cross that line at *a* = 1.2 and turns at *a* = 4.0, while walks and immobility never do; a rear sits near the limit of static stability. Recovery is partial and posture-dependent, but it holds across every tested symbol and strategy.
+
+<h2 id="transitions">Transitions the corpus never contains</h2>
+
+Can the controller execute symbol pairs it has never seen? For MLB, 30 ordered pairs have zero bout-level transitions anywhere in the reference corpus. We command each as two phases of 250 control steps, holding A and then B, from 60 initial states.
+
+<Wide n={8} title="Unobserved symbol pairs.">
+  <PairExplorer client:visible base={base} pairs={pairs} counts={transitions.counts} />
+  <Fragment slot="caption">
+    The matrix lists every ordered pair of MLB symbols. Colored cells are the 30 pairs that never occur in the corpus; click one to play its rollout. For each pair we show, among the 60 start poses, a body the labeler reads as the held symbol and then the commanded one with no unrequested behavior in between, choosing the one whose rear height, walking speed, turning or stillness is clearest. Grey cells occur in the corpus, with their bout counts. Below the video, the labeler's reading of the held symbol and of the commanded one after the switch, across 50 diverse start poses.
+  </Fragment>
+</Wide>
+
+<div class="not-prose my-6">
+<table class="mx-auto w-full max-w-md border-collapse text-center text-sm">
+  <caption class="mb-2 caption-top text-left text-sm text-zinc-500 italic"><b class="not-italic text-zinc-700 dark:text-zinc-200">Table 2.</b> Composed MLB sequences, KID to the expert (lower is better), mean ± std over three feature-extractor seeds.</caption>
+  <thead><tr class="border-t-2 border-b border-zinc-800 dark:border-zinc-300"><th class="py-1.5 text-left">Code sequence</th><th>KID ↓</th></tr></thead>
+  <tbody class="tabular-nums">
+    <tr><td class="py-1.5 text-left">Corpus sequences</td><td>0.204 ± 0.023</td></tr>
+    <tr><td class="py-1.5 text-left">Unobserved pairs</td><td>0.418 ± 0.045</td></tr>
+    <tr class="border-b-2 border-zinc-800 dark:border-zinc-300"><td class="py-1.5 text-left">Random codes</td><td>0.735 ± 0.083</td></tr>
+  </tbody>
+</table>
+</div>
+
+The resulting motion is less realistic than corpus-derived sequences but stays far from the random-code level, and the commanded behaviors remain recognizable pair by pair. Sequences with no support in the data still fall within the distribution of rat motion.
+
+<h2 id="discussion">Discussion</h2>
+
+Code2Act provides a symbolic layer that acts through physics: its symbols are simple to state, they drive the body, and they hold under perturbation. A practitioner with a segmentation, an ethogram or a set of annotated behaviors obtains an executor for all of it from a single training run, with no reward designed per behavior, no policy trained per symbol, and no controller written by hand. Swapping one vocabulary for another changes only the input stream, as we showed by training the same controller design on a Keypoint-MoSeq segmenter, a VAE codebook and a hand-written label set.
+
+The resulting command space is finite, and the interface reports which of its symbols the body can actually realize as distinct behaviors. The retained symbols support counterfactuals: held, composed into unseen sequences, and checked directly on the body. For neuroethology, this offers a way to test a behavioral vocabulary by executing it. For symbolic control, it offers a motor layer that does not have to be built one behavior at a time.
+
+The main prerequisite, and limitation, is a pretrained imitation model for the body of interest, which the interface reuses rather than replaces.
+
+<h2 id="citation">Citation</h2>
+
+```bibtex
+@article{bian2026code2act,
+  title        = {Discrete Actions for Naturalistic Behavior in Embodied Biomechanical Animal Models},
+  author       = {Bian, Kaiwen and Zhang, Charles Y. and Yang, Yuanjia and Sirbu, Aidan and
+                  Leonardis, Eric J. and Richards, Blake A. and {\"O}lveczky, Bence P. and
+                  Pereira, Talmo D.},
+  journal      = {NeurIPS 2026 Workshop on Neuro-Symbolic Embodied Intelligence (NEmo)},
+  year         = {2026}
+}
+```
+
+Code2Act builds on [MIMIC-MJX](https://mimic-mjx.talmolab.org/) and [track-mjx](https://github.com/talmolab/track-mjx) for the biomechanical rat and imitation pipeline, [Keypoint-MoSeq](https://keypoint-moseq.readthedocs.io/) for behavioral syllables, and [MuJoCo](https://mujoco.org/) and [Brax](https://github.com/google/brax) for simulation and training.

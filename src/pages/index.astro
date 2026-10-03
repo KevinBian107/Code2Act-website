@@ -1,10 +1,6 @@
 ---
 import { Font } from "astro:assets";
-
-import Links from "../components/Links.astro";
-import Authors from "../components/Authors.astro";
-import Notes from "../components/Notes.astro";
-import type { Author, Note, Link } from "../types/types";
+import { Icon } from "astro-icon/components";
 
 import Table from "../components/Table.astro";
 import TableOfContents from "../components/TableOfContents.astro";
@@ -12,101 +8,187 @@ import TableOfContents from "../components/TableOfContents.astro";
 import "../styles/global.css";
 import "katex/dist/katex-swap.css";
 
-import { Content, frontmatter } from "../paper.mdx";
+import { Content } from "../content.mdx";
 
-const tocSections = [
-  { id: "abstract", label: "Abstract" },
-  { id: "motivation", label: "Motivation" },
-  { id: "pipeline-overview", label: "Pipeline" },
-  { id: "results", label: "Results" },
-  { id: "conclusion", label: "Conclusion" },
-  { id: "citation", label: "Citation" },
+const title = "Discrete Actions for Naturalistic Behavior in Embodied Biomechanical Animal Models";
+const description =
+  "Code2Act turns any discrete behavioral vocabulary into motor commands for a 38-actuator biomechanical rat.";
+
+const authors = [
+  { name: "Kaiwen Bian", aff: "1,2" },
+  { name: "Charles Y. Zhang", aff: "3" },
+  { name: "Yuanjia Yang", aff: "1,2" },
+  { name: "Aidan Sirbu", aff: "4,5" },
+  { name: "Eric J. Leonardis", aff: "1,2" },
+  { name: "Blake A. Richards", aff: "4,5" },
+  { name: "Bence P. Ölveczky", aff: "3" },
+  { name: "Talmo D. Pereira", aff: "1,2" },
+];
+const affiliations = [
+  "Salk Institute for Biological Studies",
+  "UC San Diego",
+  "Harvard University",
+  "Mila",
+  "McGill University",
+];
+const links = [
+  { name: "Paper", url: "", icon: "ri:file-pdf-2-line", soon: true },
+  { name: "Code", url: "https://github.com/talmolab/code2act", icon: "ri:github-line" },
+  { name: "Citation", url: "#citation", icon: "ri:double-quotes-l" },
 ];
 
-interface Frontmatter {
-  title: string;
-  authors: Author[];
-  conference?: string;
-  notes?: Note[];
-  links?: Link[];
-  description?: string;
-  favicon: string;
-  thumbnail?: string;
-  theme?: "device" | "light" | "dark";
-}
-
-const {
-  title,
-  authors,
-  conference,
-  notes,
-  links,
-  description,
-  favicon,
-  thumbnail,
-  theme = "device",
-} = frontmatter as Frontmatter;
+const tocSections = [
+  { id: "motivation", label: "Motivation" },
+  { id: "method", label: "How it works" },
+  { id: "vocabularies", label: "Three vocabularies" },
+  { id: "viewer", label: "Steer it yourself" },
+  { id: "realism", label: "Realism" },
+  { id: "dynamics", label: "Inside the controller" },
+  { id: "roundtrip", label: "Round trip" },
+  { id: "perturbation", label: "Perturbation" },
+  { id: "transitions", label: "Unseen transitions" },
+  { id: "discussion", label: "Discussion" },
+  { id: "citation", label: "Citation" },
+];
 
 const baseUrl = import.meta.env.BASE_URL;
 const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
 ---
 
 <!doctype html>
-<html class="bg-white dark:bg-zinc-900" lang="en" data-theme={theme}>
+<html class="bg-white dark:bg-zinc-900" lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    {description && <meta name="description" content={description} />}
+    <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-
-    <link rel="icon" type="image/png" href={prefix + favicon} />
-
-    <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
+    <link rel="icon" type="image/png" href={prefix + "favicon.png"} />
+    <meta property="og:title" content={`Code2Act: ${title}`} />
+    <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    {thumbnail && <meta property="og:image" content={prefix + thumbnail} />}
-
-    <Font
-      cssVariable="--font-noto-sans"
-      preload={[{ subset: "latin", style: "normal" }]}
-    />
-
-    <title>{title}</title>
+    <meta property="og:image" content={prefix + "media/atlas/mlb/code000.jpg"} />
+    <Font cssVariable="--font-noto-sans" preload={[{ subset: "latin", style: "normal" }]} />
+    <title>Code2Act: {title}</title>
   </head>
   <body
-    class="prose prose-sm sm:prose-lg prose-zinc dark:prose-invert prose-a:text-blue-500 prose-a:dark:text-blue-300 prose-a:no-underline prose-a:hover:underline prose-a:font-normal prose-code:bg-zinc-200 prose-code:dark:bg-zinc-800 prose-code:text-zinc-800 prose-code:dark:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none max-w-none pt-16 pb-6 font-(family-name:--font-noto-sans)"
+    class="prose prose-sm sm:prose-lg prose-zinc dark:prose-invert prose-a:text-blue-600 prose-a:dark:text-blue-300 prose-a:no-underline prose-a:hover:underline prose-a:font-normal prose-code:bg-zinc-200 prose-code:dark:bg-zinc-800 prose-code:text-zinc-800 prose-code:dark:text-zinc-200 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none max-w-none pb-10 font-(family-name:--font-noto-sans)"
   >
-    <header class="mx-auto mb-8 max-w-[50rem] px-4 text-center sm:mb-12 sm:px-6">
-      <h1 class="text-3xl font-medium sm:text-5xl">{title}</h1>
-      <div class="flex flex-col items-center gap-3 sm:gap-6">
-        <Authors authors={authors} />
-        <div class="text-center text-sm text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-          <sup>1</sup>Computational Neurobiology Laboratory, Salk Institute for Biological Studies&ensp;
-          <sup>2</sup>Wu Tsai Neurosciences Institute, Stanford University&ensp;
-          <sup>3</sup>Department of Statistics, Stanford University&ensp;
-          <sup>4</sup>Department of Neurosciences, UC San Diego&ensp;
-          <sup>5</sup>Halıcıoğlu Data Science Institute, UC San Diego&ensp;
-          <sup>6</sup>Department of Organismic and Evolutionary Biology, Harvard University&ensp;
-          <sup>7</sup>Department of Computer Science, Harvard University&ensp;
-          <sup>8</sup>Mila&ensp;
-          <sup>9</sup>School of Computer Science, McGill University
+    <header class="not-prose bg-zinc-950 text-white">
+      <div class="mx-auto max-w-[64rem] px-6 pt-14 pb-12 sm:pt-20">
+        <div class="text-center">
+          <div class="mb-3 text-sm font-semibold tracking-[0.25em] text-sky-300 uppercase">Code2Act</div>
+          <h1 class="mx-auto max-w-4xl text-3xl leading-tight font-semibold sm:text-5xl">{title}</h1>
+          <div class="mx-auto mt-6 flex max-w-4xl flex-wrap justify-center gap-x-5 gap-y-1.5 text-base text-zinc-200 sm:text-lg">
+            {
+              authors.map((a) => (
+                <span>
+                  {a.name}
+                  <sup class="ml-0.5 text-xs text-zinc-400">{a.aff}</sup>
+                </span>
+              ))
+            }
+          </div>
+          <div class="mx-auto mt-3 flex max-w-4xl flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-zinc-400">
+            {
+              affiliations.map((a, i) => (
+                <span>
+                  <sup class="mr-0.5">{i + 1}</sup>
+                  {a}
+                </span>
+              ))
+            }
+          </div>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-zinc-300 sm:text-base">
+            <span>NeurIPS 2026 Workshop on Neuro-Symbolic Embodied Intelligence (NEmo)</span>
+            <span class="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-zinc-900 uppercase">Oral</span>
+          </div>
+          <div class="mt-6 flex flex-wrap justify-center gap-2">
+            {
+              links.map((l) =>
+                l.soon ? (
+                  <span class="flex items-center gap-2 rounded-full bg-zinc-800 px-4 py-1.5 text-sm text-zinc-400 sm:px-5 sm:py-2 sm:text-base">
+                    <Icon name={l.icon} />
+                    {l.name} <span class="text-xs">(coming soon)</span>
+                  </span>
+                ) : (
+                  <a
+                    href={l.url}
+                    class="flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-sm text-zinc-900 hover:bg-zinc-200 sm:px-5 sm:py-2 sm:text-base"
+                  >
+                    <Icon name={l.icon} />
+                    {l.name}
+                  </a>
+                ),
+              )
+            }
+          </div>
         </div>
-        {conference && <div>{conference}</div>}
-        {notes && <Notes notes={notes} />}
-        {links && <Links links={links} />}
+
+        <div class="mt-12 grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+          <div>
+            <h2 class="mb-3 text-lg font-semibold text-zinc-100">Abstract</h2>
+            <p class="text-justify text-[0.95rem] leading-relaxed text-zinc-300">
+              Embodied symbolic systems depend on a discrete vocabulary that compresses continuous motion into named
+              actions, which make planning and annotation tractable. Many such vocabularies exist, from unsupervised
+              segmentation to hand annotation, but they only describe motion, and making a body perform one of their symbols
+              requires a hand-engineered controller or a policy trained for that symbol. We present <b class="text-white"
+                >Code2Act</b
+              >, which turns any discrete vocabulary into motor commands for a 38-actuator biomechanical rat. One recurrent
+              controller reads only the symbol stream and proprioception, predicts the motor latent that a frozen pretrained
+              imitation model would supply, and decodes through that model's inverse-dynamics module. A single training run
+              then covers an entire vocabulary with no per-symbol reward and no per-symbol training. We drove one controller
+              from three vocabularies of different provenance and size. An independent labeler can recover each steering
+              symbol from the motion it produced, across arbitrary initial poses and external velocity impulses. Symbols are
+              executed by the body and realized as distinct motion, and novel combinations of symbol pairs can produce
+              within-distribution motion patterns.
+            </p>
+          </div>
+          <div>
+            <video
+              class="w-full rounded-xl shadow-2xl ring-1 ring-white/10"
+              src={prefix + "media/sequences/tour.mp4"}
+              poster={prefix + "media/sequences/tour.jpg"}
+              autoplay
+              loop
+              muted
+              playsinline></video>
+            <p class="mt-2 text-center text-xs text-zinc-400">
+              The MLB controller following a chain of six symbols (walk, rear, walk, still, rear, turn) from a test-set start pose. The body's color is the
+              commanded symbol.
+            </p>
+          </div>
+        </div>
       </div>
     </header>
+
     <TableOfContents sections={tocSections} />
-    <main>
+    <main class="pt-6">
       <Content components={{ table: Table }} />
     </main>
-    <footer class="mx-auto max-w-[50rem] px-6 text-center">
-      <p class="prose-sm text-center">
-        Built with <a
-          href="https://research-template.roman.technology"
-          rel="nofollow">Roman Hauksson-Neill's project page template</a
-        >
+    <footer class="mx-auto mt-16 max-w-[50rem] px-6 text-center">
+      <p class="prose-sm text-center text-zinc-400">
+        Built with <a href="https://research-template.roman.technology" rel="nofollow">Roman Hauksson-Neill's project page template</a>.
       </p>
     </footer>
+
+    <script>
+      // Reveal the floating table of contents once the hero is scrolled past,
+      // and highlight the section in view.
+      const toc = document.getElementById("toc");
+      const header = document.querySelector("header");
+      const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"));
+      const onScroll = () => {
+        if (!toc || !header) return;
+        toc.classList.toggle("visible", window.scrollY > header.offsetHeight - 80);
+        let current = "";
+        for (const a of links) {
+          const el = document.getElementById(a.dataset.tocLink!);
+          if (el && el.getBoundingClientRect().top < window.innerHeight * 0.35) current = a.dataset.tocLink!;
+        }
+        links.forEach((a) => a.classList.toggle("active", a.dataset.tocLink === current));
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    </script>
   </body>
 </html>
