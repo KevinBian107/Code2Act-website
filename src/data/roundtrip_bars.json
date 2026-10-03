@@ -1,0 +1,220 @@
+{
+ "mlb": {
+  "rows": [
+   {
+    "label": "Walk_Left",
+    "base": "Walk",
+    "n": 60,
+    "exact": 0.6667,
+    "same": 0.0,
+    "cross": 0.3333,
+    "same_dest": null,
+    "dest": "Immobile"
+   },
+   {
+    "label": "Walk_Right",
+    "base": "Walk",
+    "n": 60,
+    "exact": 0.7333,
+    "same": 0.0333,
+    "cross": 0.2333,
+    "same_dest": "Walk_Left",
+    "dest": "Rear_Right"
+   },
+   {
+    "label": "Walk_Straight",
+    "base": "Walk",
+    "n": 60,
+    "exact": 0.0,
+    "same": 0.7167,
+    "cross": 0.2833,
+    "same_dest": "Walk_Left",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Rear_Left",
+    "base": "Rear",
+    "n": 60,
+    "exact": 0.6167,
+    "same": 0.0667,
+    "cross": 0.3167,
+    "same_dest": "Rear_Right",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Rear_Right",
+    "base": "Rear",
+    "n": 60,
+    "exact": 0.7333,
+    "same": 0.2667,
+    "cross": 0.0,
+    "same_dest": "Rear_Left",
+    "dest": null
+   },
+   {
+    "label": "Rear_Straight",
+    "base": "Rear",
+    "n": 60,
+    "exact": 0.0667,
+    "same": 0.8167,
+    "cross": 0.1167,
+    "same_dest": "Rear_Right",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Turn_Left",
+    "base": "Turn",
+    "n": 60,
+    "exact": 0.0167,
+    "same": 0.0,
+    "cross": 0.9833,
+    "same_dest": null,
+    "dest": "Walk_Left"
+   },
+   {
+    "label": "Turn_Right",
+    "base": "Turn",
+    "n": 60,
+    "exact": 0.8833,
+    "same": 0.0,
+    "cross": 0.1167,
+    "same_dest": null,
+    "dest": "Walk_Right"
+   },
+   {
+    "label": "Immobile",
+    "base": "Immobile",
+    "n": 60,
+    "exact": 0.5667,
+    "same": 0.0,
+    "cross": 0.4333,
+    "same_dest": null,
+    "dest": "Walk_Left"
+   }
+  ],
+  "symbol_acc": 0.4759,
+  "behavior_acc": 0.687
+ },
+ "kpms": {
+  "rows": [
+   {
+    "label": "Walk_Left",
+    "base": "Walk",
+    "n": 60,
+    "exact": 0.5167,
+    "same": 0.45,
+    "cross": 0.0333,
+    "same_dest": "Walk_Right",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Walk_Right",
+    "base": "Walk",
+    "n": 180,
+    "exact": 0.6278,
+    "same": 0.0333,
+    "cross": 0.3389,
+    "same_dest": "Walk_Left",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Rear_Right",
+    "base": "Rear",
+    "n": 300,
+    "exact": 0.2667,
+    "same": 0.0767,
+    "cross": 0.6567,
+    "same_dest": "Rear_Left",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Turn_Left",
+    "base": "Turn",
+    "n": 120,
+    "exact": 0.5167,
+    "same": 0.0,
+    "cross": 0.4833,
+    "same_dest": null,
+    "dest": "Immobile"
+   },
+   {
+    "label": "Turn_Right",
+    "base": "Turn",
+    "n": 240,
+    "exact": 0.0083,
+    "same": 0.0,
+    "cross": 0.9917,
+    "same_dest": null,
+    "dest": "Immobile"
+   },
+   {
+    "label": "Immobile",
+    "base": "Immobile",
+    "n": 600,
+    "exact": 0.7083,
+    "same": 0.0,
+    "cross": 0.2917,
+    "same_dest": null,
+    "dest": "Walk_Right"
+   }
+  ],
+  "symbol_acc": 0.4753,
+  "behavior_acc": 0.5127
+ },
+ "kvae": {
+  "rows": [
+   {
+    "label": "Walk_Left",
+    "base": "Walk",
+    "n": 300,
+    "exact": 0.7333,
+    "same": 0.0333,
+    "cross": 0.2333,
+    "same_dest": "Walk_Straight",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Walk_Right",
+    "base": "Walk",
+    "n": 60,
+    "exact": 0.95,
+    "same": 0.0167,
+    "cross": 0.0333,
+    "same_dest": "Walk_Left",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Rear_Left",
+    "base": "Rear",
+    "n": 60,
+    "exact": 0.7333,
+    "same": 0.2167,
+    "cross": 0.05,
+    "same_dest": "Rear_Right",
+    "dest": "Walk_Right"
+   },
+   {
+    "label": "Rear_Right",
+    "base": "Rear",
+    "n": 240,
+    "exact": 0.6625,
+    "same": 0.0958,
+    "cross": 0.2417,
+    "same_dest": "Rear_Left",
+    "dest": "Immobile"
+   },
+   {
+    "label": "Immobile",
+    "base": "Immobile",
+    "n": 840,
+    "exact": 0.8512,
+    "same": 0.0,
+    "cross": 0.1488,
+    "same_dest": null,
+    "dest": "Walk_Left"
+   }
+  ],
+  "symbol_acc": 0.7967,
+  "behavior_acc": 0.828
+ }
+}

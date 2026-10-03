@@ -1,0 +1,209 @@
+[
+ {
+  "code": 0,
+  "name": "Walk_L",
+  "color": [
+   0.1,
+   0.25,
+   0.65
+  ],
+  "bodies": [
+   26,
+   35,
+   59,
+   28
+  ],
+  "readouts": [
+   "Walk_L",
+   "Walk_L",
+   "Walk_L",
+   "Walk_L"
+  ],
+  "src": "media/roundtrip/Walk_L.mp4",
+  "poster": "media/roundtrip/Walk_L.jpg"
+ },
+ {
+  "code": 1,
+  "name": "Walk_R",
+  "color": [
+   0.55,
+   0.7,
+   0.95
+  ],
+  "bodies": [
+   26,
+   48,
+   10,
+   23
+  ],
+  "readouts": [
+   "Walk_R",
+   "Walk_R",
+   "Walk_R",
+   "Walk_R"
+  ],
+  "src": "media/roundtrip/Walk_R.mp4",
+  "poster": "media/roundtrip/Walk_R.jpg"
+ },
+ {
+  "code": 2,
+  "name": "Walk_S",
+  "color": [
+   0.3,
+   0.5,
+   0.85
+  ],
+  "bodies": [
+   7,
+   44,
+   38,
+   28
+  ],
+  "readouts": [
+   "Rear_R",
+   "Walk_L",
+   "Walk_L",
+   "Walk_L"
+  ],
+  "src": "media/roundtrip/Walk_S.mp4",
+  "poster": "media/roundtrip/Walk_S.jpg"
+ },
+ {
+  "code": 3,
+  "name": "Rear_L",
+  "color": [
+   0.1,
+   0.45,
+   0.2
+  ],
+  "bodies": [
+   23,
+   38,
+   20,
+   9
+  ],
+  "readouts": [
+   "Rear_L",
+   "Walk_R",
+   "Rear_L",
+   "Immobile"
+  ],
+  "src": "media/roundtrip/Rear_L.mp4",
+  "poster": "media/roundtrip/Rear_L.jpg"
+ },
+ {
+  "code": 4,
+  "name": "Rear_R",
+  "color": [
+   0.55,
+   0.8,
+   0.55
+  ],
+  "bodies": [
+   56,
+   28,
+   13,
+   6
+  ],
+  "readouts": [
+   "Rear_R",
+   "Rear_L",
+   "Rear_R",
+   "Rear_S"
+  ],
+  "src": "media/roundtrip/Rear_R.mp4",
+  "poster": "media/roundtrip/Rear_R.jpg"
+ },
+ {
+  "code": 5,
+  "name": "Rear_S",
+  "color": [
+   0.25,
+   0.65,
+   0.35
+  ],
+  "bodies": [
+   5,
+   31,
+   55,
+   49
+  ],
+  "readouts": [
+   "Immobile",
+   "Rear_R",
+   "Immobile",
+   "Rear_L"
+  ],
+  "src": "media/roundtrip/Rear_S.mp4",
+  "poster": "media/roundtrip/Rear_S.jpg"
+ },
+ {
+  "code": 6,
+  "name": "Turn_L",
+  "color": [
+   0.8,
+   0.4,
+   0.1
+  ],
+  "bodies": [
+   48,
+   42,
+   57,
+   2
+  ],
+  "readouts": [
+   "Walk_L",
+   "Walk_L",
+   "Walk_L",
+   "Walk_L"
+  ],
+  "src": "media/roundtrip/Turn_L.mp4",
+  "poster": "media/roundtrip/Turn_L.jpg"
+ },
+ {
+  "code": 7,
+  "name": "Turn_R",
+  "color": [
+   0.95,
+   0.7,
+   0.35
+  ],
+  "bodies": [
+   5,
+   43,
+   18,
+   35
+  ],
+  "readouts": [
+   "Turn_R",
+   "Turn_R",
+   "Turn_R",
+   "Turn_R"
+  ],
+  "src": "media/roundtrip/Turn_R.mp4",
+  "poster": "media/roundtrip/Turn_R.jpg"
+ },
+ {
+  "code": 8,
+  "name": "Immobile",
+  "color": [
+   0.55,
+   0.55,
+   0.55
+  ],
+  "bodies": [
+   46,
+   1,
+   57,
+   13
+  ],
+  "readouts": [
+   "Immobile",
+   "Walk_L",
+   "Immobile",
+   "Immobile"
+  ],
+  "src": "media/roundtrip/Immobile.mp4",
+  "poster": "media/roundtrip/Immobile.jpg"
+ }
+]

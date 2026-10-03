@@ -1,0 +1,593 @@
+{
+ "mlb": [
+  {
+   "code": 0,
+   "name": "Walk_L",
+   "readout": "Walk_L",
+   "behavior": "Walk",
+   "color": [
+    0.1,
+    0.25,
+    0.65
+   ],
+   "usage": 9694,
+   "body": 99,
+   "src": "media/atlas/mlb/code000.mp4",
+   "poster": "media/atlas/mlb/code000.jpg"
+  },
+  {
+   "code": 1,
+   "name": "Walk_R",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.55,
+    0.7,
+    0.95
+   ],
+   "usage": 77492,
+   "body": 87,
+   "src": "media/atlas/mlb/code001.mp4",
+   "poster": "media/atlas/mlb/code001.jpg"
+  },
+  {
+   "code": 2,
+   "name": "Walk_S",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 2528,
+   "body": 26,
+   "src": "media/atlas/mlb/code002.mp4",
+   "poster": "media/atlas/mlb/code002.jpg"
+  },
+  {
+   "code": 3,
+   "name": "Rear_L",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.1,
+    0.45,
+    0.2
+   ],
+   "usage": 107,
+   "body": 76,
+   "src": "media/atlas/mlb/code003.mp4",
+   "poster": "media/atlas/mlb/code003.jpg"
+  },
+  {
+   "code": 4,
+   "name": "Rear_R",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.55,
+    0.8,
+    0.55
+   ],
+   "usage": 448,
+   "body": 78,
+   "src": "media/atlas/mlb/code004.mp4",
+   "poster": "media/atlas/mlb/code004.jpg"
+  },
+  {
+   "code": 5,
+   "name": "Rear_S",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.25,
+    0.65,
+    0.35
+   ],
+   "usage": 11307,
+   "body": 31,
+   "src": "media/atlas/mlb/code005.mp4",
+   "poster": "media/atlas/mlb/code005.jpg"
+  },
+  {
+   "code": 6,
+   "name": "Turn_L",
+   "readout": "Walk_L",
+   "behavior": "Walk",
+   "color": [
+    0.8,
+    0.4,
+    0.1
+   ],
+   "usage": 13706,
+   "body": 1,
+   "src": "media/atlas/mlb/code006.mp4",
+   "poster": "media/atlas/mlb/code006.jpg"
+  },
+  {
+   "code": 7,
+   "name": "Turn_R",
+   "readout": "Turn_R",
+   "behavior": "Turn",
+   "color": [
+    0.95,
+    0.7,
+    0.35
+   ],
+   "usage": 3624,
+   "body": 99,
+   "src": "media/atlas/mlb/code007.mp4",
+   "poster": "media/atlas/mlb/code007.jpg"
+  },
+  {
+   "code": 8,
+   "name": "Immobile",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 2094,
+   "body": 30,
+   "src": "media/atlas/mlb/code008.mp4",
+   "poster": "media/atlas/mlb/code008.jpg"
+  }
+ ],
+ "kpms": [
+  {
+   "code": 2,
+   "name": "code 2",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 16169,
+   "body": 23,
+   "src": "media/atlas/kpms/code002.mp4",
+   "poster": "media/atlas/kpms/code002.jpg"
+  },
+  {
+   "code": 4,
+   "name": "code 4",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.25,
+    0.65,
+    0.35
+   ],
+   "usage": 19631,
+   "body": 32,
+   "src": "media/atlas/kpms/code004.mp4",
+   "poster": "media/atlas/kpms/code004.jpg"
+  },
+  {
+   "code": 5,
+   "name": "code 5",
+   "readout": "Turn_L",
+   "behavior": "Turn",
+   "color": [
+    0.8,
+    0.4,
+    0.1
+   ],
+   "usage": 34549,
+   "body": 31,
+   "src": "media/atlas/kpms/code005.mp4",
+   "poster": "media/atlas/kpms/code005.jpg"
+  },
+  {
+   "code": 1,
+   "name": "code 1",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 2636,
+   "body": 78,
+   "src": "media/atlas/kpms/code001.mp4",
+   "poster": "media/atlas/kpms/code001.jpg"
+  },
+  {
+   "code": 0,
+   "name": "code 0",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 23582,
+   "body": 56,
+   "src": "media/atlas/kpms/code000.mp4",
+   "poster": "media/atlas/kpms/code000.jpg"
+  },
+  {
+   "code": 3,
+   "name": "code 3",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 19738,
+   "body": 53,
+   "src": "media/atlas/kpms/code003.mp4",
+   "poster": "media/atlas/kpms/code003.jpg"
+  },
+  {
+   "code": 6,
+   "name": "code 6",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 1194,
+   "body": 11,
+   "src": "media/atlas/kpms/code006.mp4",
+   "poster": "media/atlas/kpms/code006.jpg"
+  },
+  {
+   "code": 9,
+   "name": "code 9",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.25,
+    0.65,
+    0.35
+   ],
+   "usage": 35,
+   "body": 28,
+   "src": "media/atlas/kpms/code009.mp4",
+   "poster": "media/atlas/kpms/code009.jpg"
+  },
+  {
+   "code": 97,
+   "name": "code 97",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 34,
+   "body": 83,
+   "src": "media/atlas/kpms/code097.mp4",
+   "poster": "media/atlas/kpms/code097.jpg"
+  },
+  {
+   "code": 78,
+   "name": "code 78",
+   "readout": "Turn_S",
+   "behavior": "Turn",
+   "color": [
+    0.875,
+    0.55,
+    0.225
+   ],
+   "usage": 59,
+   "body": 15,
+   "src": "media/atlas/kpms/code078.mp4",
+   "poster": "media/atlas/kpms/code078.jpg"
+  },
+  {
+   "code": 73,
+   "name": "code 73",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 32,
+   "body": 63,
+   "src": "media/atlas/kpms/code073.mp4",
+   "poster": "media/atlas/kpms/code073.jpg"
+  },
+  {
+   "code": 93,
+   "name": "code 93",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 35,
+   "body": 8,
+   "src": "media/atlas/kpms/code093.mp4",
+   "poster": "media/atlas/kpms/code093.jpg"
+  },
+  {
+   "code": 96,
+   "name": "code 96",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 39,
+   "body": 8,
+   "src": "media/atlas/kpms/code096.mp4",
+   "poster": "media/atlas/kpms/code096.jpg"
+  },
+  {
+   "code": 59,
+   "name": "code 59",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 41,
+   "body": 85,
+   "src": "media/atlas/kpms/code059.mp4",
+   "poster": "media/atlas/kpms/code059.jpg"
+  },
+  {
+   "code": 39,
+   "name": "code 39",
+   "readout": "Turn_S",
+   "behavior": "Turn",
+   "color": [
+    0.875,
+    0.55,
+    0.225
+   ],
+   "usage": 34,
+   "body": 3,
+   "src": "media/atlas/kpms/code039.mp4",
+   "poster": "media/atlas/kpms/code039.jpg"
+  }
+ ],
+ "kvae": [
+  {
+   "code": 24,
+   "name": "code 24",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 6041,
+   "body": 9,
+   "src": "media/atlas/kvae/code024.mp4",
+   "poster": "media/atlas/kvae/code024.jpg"
+  },
+  {
+   "code": 23,
+   "name": "code 23",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 5973,
+   "body": 88,
+   "src": "media/atlas/kvae/code023.mp4",
+   "poster": "media/atlas/kvae/code023.jpg"
+  },
+  {
+   "code": 0,
+   "name": "code 0",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 4223,
+   "body": 4,
+   "src": "media/atlas/kvae/code000.mp4",
+   "poster": "media/atlas/kvae/code000.jpg"
+  },
+  {
+   "code": 1,
+   "name": "code 1",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 5687,
+   "body": 41,
+   "src": "media/atlas/kvae/code001.mp4",
+   "poster": "media/atlas/kvae/code001.jpg"
+  },
+  {
+   "code": 18,
+   "name": "code 18",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 5465,
+   "body": 79,
+   "src": "media/atlas/kvae/code018.mp4",
+   "poster": "media/atlas/kvae/code018.jpg"
+  },
+  {
+   "code": 13,
+   "name": "code 13",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 5903,
+   "body": 30,
+   "src": "media/atlas/kvae/code013.mp4",
+   "poster": "media/atlas/kvae/code013.jpg"
+  },
+  {
+   "code": 5,
+   "name": "code 5",
+   "readout": "Walk_S",
+   "behavior": "Walk",
+   "color": [
+    0.3,
+    0.5,
+    0.85
+   ],
+   "usage": 5148,
+   "body": 35,
+   "src": "media/atlas/kvae/code005.mp4",
+   "poster": "media/atlas/kvae/code005.jpg"
+  },
+  {
+   "code": 3,
+   "name": "code 3",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.25,
+    0.65,
+    0.35
+   ],
+   "usage": 3785,
+   "body": 77,
+   "src": "media/atlas/kvae/code003.mp4",
+   "poster": "media/atlas/kvae/code003.jpg"
+  },
+  {
+   "code": 4,
+   "name": "code 4",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 4539,
+   "body": 99,
+   "src": "media/atlas/kvae/code004.mp4",
+   "poster": "media/atlas/kvae/code004.jpg"
+  },
+  {
+   "code": 12,
+   "name": "code 12",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 3989,
+   "body": 26,
+   "src": "media/atlas/kvae/code012.mp4",
+   "poster": "media/atlas/kvae/code012.jpg"
+  },
+  {
+   "code": 6,
+   "name": "code 6",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 5009,
+   "body": 54,
+   "src": "media/atlas/kvae/code006.mp4",
+   "poster": "media/atlas/kvae/code006.jpg"
+  },
+  {
+   "code": 10,
+   "name": "code 10",
+   "readout": "Immobile_S",
+   "behavior": "Immobile",
+   "color": [
+    0.55,
+    0.55,
+    0.55
+   ],
+   "usage": 3859,
+   "body": 9,
+   "src": "media/atlas/kvae/code010.mp4",
+   "poster": "media/atlas/kvae/code010.jpg"
+  },
+  {
+   "code": 19,
+   "name": "code 19",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.25,
+    0.65,
+    0.35
+   ],
+   "usage": 5285,
+   "body": 21,
+   "src": "media/atlas/kvae/code019.mp4",
+   "poster": "media/atlas/kvae/code019.jpg"
+  },
+  {
+   "code": 20,
+   "name": "code 20",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.25,
+    0.65,
+    0.35
+   ],
+   "usage": 5911,
+   "body": 13,
+   "src": "media/atlas/kvae/code020.mp4",
+   "poster": "media/atlas/kvae/code020.jpg"
+  },
+  {
+   "code": 8,
+   "name": "code 8",
+   "readout": "Rear_S",
+   "behavior": "Rear",
+   "color": [
+    0.25,
+    0.65,
+    0.35
+   ],
+   "usage": 3859,
+   "body": 14,
+   "src": "media/atlas/kvae/code008.mp4",
+   "poster": "media/atlas/kvae/code008.jpg"
+  }
+ ]
+}

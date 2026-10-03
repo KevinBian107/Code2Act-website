@@ -1,0 +1,70 @@
+{
+ "mlb": [
+  {
+   "behavior": "Rear",
+   "code": 4,
+   "name": "Rear_R",
+   "kick_time": 2.0,
+   "duration": 7.0,
+   "amps": {
+    "0.6": {
+     "src": "media/kick/mlb_rear_a0.6.mp4",
+     "poster": "media/kick/mlb_rear_a0.6.jpg",
+     "body": 3,
+     "recovered": 0.557
+    },
+    "1.2": {
+     "src": "media/kick/mlb_rear_a1.2.mp4",
+     "poster": "media/kick/mlb_rear_a1.2.jpg",
+     "body": 11,
+     "recovered": 0.692
+    },
+    "2.4": {
+     "src": "media/kick/mlb_rear_a2.4.mp4",
+     "poster": "media/kick/mlb_rear_a2.4.jpg",
+     "body": 31,
+     "recovered": 0.909
+    },
+    "4": {
+     "src": "media/kick/mlb_rear_a4.mp4",
+     "poster": "media/kick/mlb_rear_a4.jpg",
+     "body": 14,
+     "recovered": 0.956
+    }
+   }
+  },
+  {
+   "behavior": "Walk",
+   "code": 0,
+   "name": "Walk_L",
+   "kick_time": 2.0,
+   "duration": 7.0,
+   "amps": {
+    "0.6": {
+     "src": "media/kick/mlb_walk_a0.6.mp4",
+     "poster": "media/kick/mlb_walk_a0.6.jpg",
+     "body": 40,
+     "recovered": 0.274
+    },
+    "1.2": {
+     "src": "media/kick/mlb_walk_a1.2.mp4",
+     "poster": "media/kick/mlb_walk_a1.2.jpg",
+     "body": 36,
+     "recovered": 0.388
+    },
+    "2.4": {
+     "src": "media/kick/mlb_walk_a2.4.mp4",
+     "poster": "media/kick/mlb_walk_a2.4.jpg",
+     "body": 16,
+     "recovered": 0.6
+    },
+    "4": {
+     "src": "media/kick/mlb_walk_a4.mp4",
+     "poster": "media/kick/mlb_walk_a4.jpg",
+     "body": 18,
+     "recovered": 0.784
+    }
+   }
+  }
+ ]
+}
