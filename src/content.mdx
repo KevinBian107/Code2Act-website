@@ -69,6 +69,13 @@ Executed on the body, not every symbol is distinguishable. The nine MLB symbols 
 
 The controller is not limited to holding one symbol. Chain symbols into a command stream and it moves between motor programs.
 
+<div class="not-prose my-6 flex flex-col items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-blue-900 dark:bg-blue-950/40">
+  <p class="m-0 text-[0.95rem] leading-relaxed text-zinc-700 dark:text-zinc-300">
+    <b class="text-zinc-900 dark:text-zinc-50">Try it live.</b> Compose your own symbol sequence, or switch symbols on the fly, and watch the paper's MLB controller execute it. Physics and controller run in your browser, with no server.
+  </p>
+  <a href="https://code2act-demo.kaiwenbian107.workers.dev/" target="_blank" rel="noopener" class="shrink-0 rounded-full bg-blue-700 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-800 hover:no-underline">Open the live demo ↗</a>
+</div>
+
 <Wide n={3} title="Interactive sequence viewer.">
   <SequenceViewer client:visible base={base} presets={sequences} />
   <Fragment slot="caption">
