@@ -54,7 +54,7 @@ const STAGES: Stage[] = [
     tab: "Overview",
     title: "One controller, any vocabulary",
     body: [
-      "A steering strategy turns the reference motion into a stream of discrete symbols. A recurrent controller reads only that stream and the body's proprioception, predicts the motor intention a pretrained imitation model would have produced, and decodes it to torques through that model's inverse-dynamics decoder.",
+      "An external vocabulary, defined outside Code2Act and frozen, turns the reference motion into a stream of discrete symbols. A recurrent controller reads only that stream and the body's proprioception, predicts the motor intention a pretrained imitation model would have produced, and decodes it to torques through that model's inverse-dynamics decoder.",
       "The goal trajectory only reaches a frozen encoder that supplies a KL target during training. It never enters the action path.",
     ],
     nodes: ["ref", "goal", "steer", "codes", "gru", "head", "enc", "z", "dec", "sim", "reward"],
@@ -77,11 +77,11 @@ const STAGES: Stage[] = [
   },
   {
     key: "stage2",
-    tab: "2 · Steering strategy",
-    title: "Stage 2: a discrete vocabulary, fixed in advance",
+    tab: "2 · Vocabulary",
+    title: "Stage 2: an external vocabulary, fixed in advance",
     body: [
-      "A steering strategy assigns every reference frame one of K symbols. It is fit or written in a separate process and frozen: no gradient reaches it, and the controller only ever sees the integer stream.",
-      "We use three: unsupervised Keypoint-MoSeq syllables (K = 100), a kinematics-VAE codebook clustered with K-means (K = 25), and a hand-written set of manually labeled behaviors (K = 9). At each step the controller embeds the next five symbols.",
+      "A vocabulary assigns every reference frame one of K symbols, regardless of where it came from. It is fit or written in a separate process and frozen: no gradient reaches it, and the controller only ever sees the integer stream.",
+      "We use three of different origin: unsupervised Keypoint-MoSeq syllables (K = 100), a kinematics-VAE codebook clustered with K-means (K = 25), and a hand-written set of manually labeled behaviors (K = 9). At each step the controller embeds the next five symbols.",
     ],
     nodes: ["ref", "steer", "codes"],
     edges: ["ref-steer", "steer-codes"],
@@ -91,7 +91,7 @@ const STAGES: Stage[] = [
     tab: "3 · Distillation",
     title: "Stage 3: learning to act from symbols",
     body: [
-      "A four-layer GRU reads the symbol context and proprioception. A head maps its state to a Gaussian over the intention, which is regressed onto the frozen encoder's distribution by a per-step KL, sampled, and decoded to torques by the Stage-1 decoder.",
+      "A four-layer GRU reads the symbol context and proprioception. A head maps its state to a Gaussian over the intention, which is regressed onto the frozen encoder's distribution by a per-step KL, sampled, and decoded to torques by the Stage-1 decoder, which is fine-tuned with the controller.",
       "Training is PPO on the MIMIC-MJX motion-tracking reward plus the distillation KL, on the student's own rollouts. One run covers every symbol in the vocabulary.",
     ],
     nodes: ["ref", "goal", "codes", "gru", "head", "enc", "z", "dec", "sim", "reward"],
@@ -103,7 +103,7 @@ const STAGES: Stage[] = [
     tab: "Execution",
     title: "Execution: symbols in, behavior out",
     body: [
-      "At test time the reference and the encoder are gone. The controller receives about log₂K bits per step where the imitation policy had a 640-d goal, and the body still produces the commanded behavior.",
+      "At test time the reference and the encoder are gone. The controller receives only a stream of symbols where the imitation policy had a 640-d goal, and the body still produces the commanded behavior.",
       "Every experiment below runs in this decoder-only mode: hold a symbol, chain symbols, or kick the body, and watch what the symbol stream alone produces.",
     ],
     nodes: ["codes", "gru", "head", "z", "dec", "sim"],
@@ -115,7 +115,7 @@ const STAGES: Stage[] = [
 const BOX: Record<NodeId, { x: number; y: number; w: number; h: number; t: string; sub?: string; s?: string }> = {
   ref: { x: 20, y: 40, w: 150, h: 64, t: "Reference motion", s: "motion capture" },
   goal: { x: 215, y: 40, w: 150, h: 64, t: "Goal  sᵍ", s: "5-frame horizon · 640-d" },
-  steer: { x: 20, y: 200, w: 150, h: 70, t: "Steering strategy", s: "KPMS · KVAE · MLB" },
+  steer: { x: 20, y: 200, w: 150, h: 70, t: "Vocabulary", s: "KPMS · KVAE · MLB" },
   codes: { x: 215, y: 200, w: 150, h: 70, t: "", s: "symbols cₜ … cₜ₊₄" },
   gru: { x: 410, y: 200, w: 120, h: 70, t: "GRU stack", s: "hₜ" },
   head: { x: 575, y: 200, w: 120, h: 70, t: "Distill head g", s: "μᵈ, σᵈ" },

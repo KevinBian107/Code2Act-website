@@ -87,7 +87,7 @@ export default function RoundTripExplorer({ base, clips, bars }: Props) {
           </div>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
             Four bodies, four random start poses, one held symbol: <b>{pretty(selName)}</b>. Each tag is the readout of the
-            same kinematic labeler that scores the round trip, computed on that body's settled motion.
+            same kinematic labeler that scores label recovery, computed on that body's settled motion.
           </p>
         </div>
 

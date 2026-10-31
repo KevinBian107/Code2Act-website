@@ -29,12 +29,12 @@ Controllers that do act through a discrete bottleneck learn their own codebook, 
 On this page we walk through what the controller does, with the rollouts behind the paper's figures rendered as video and several of the analyses made interactive.
 
 <div class="not-prose my-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4 text-[0.95rem] leading-relaxed text-zinc-700">
-  <b class="text-zinc-900">A note on the examples.</b> The video clips on this page are curated for the best visualization: from each set of rollouts we show an example chosen by a fixed rule, usually the clearest or best-recovering one, and each caption states that rule. The numbers are not curated. Tables, charts, round-trip bars and success rates use all rollouts, as in the paper.
+  <b class="text-zinc-900">A note on the examples.</b> The video clips on this page are curated for the best visualization: from each set of rollouts we show an example chosen by a fixed rule, usually the clearest or best-recovering one, and each caption states that rule. The numbers are not curated. Tables, charts, label-recovery bars and success rates use all rollouts, as in the paper.
 </div>
 
 <h2 id="method">How Code2Act works</h2>
 
-Code2Act is built in three stages, each run as its own process. A pretrained imitation model supplies both a privileged teacher and an inverse-dynamics decoder. A steering strategy assigns every reference frame a discrete symbol. And a recurrent controller learns, by reinforcement learning on its own rollouts, to reproduce the motor intention the imitation model would have produced from the full reference, while seeing only the symbols.
+Code2Act is built in three stages, each run as its own process. (1) A pretrained imitation model supplies both a privileged teacher (its frozen encoder) and an inverse-dynamics decoder. (2) An external vocabulary assigns every reference frame a discrete symbol; it can be any labeling, and the controller never changes it. (3) A recurrent controller learns, by reinforcement learning on its own rollouts, to reproduce the motor intention the imitation model would have produced from the full reference, while seeing only the symbols. Stage 3 is the contribution: Stage 1 is the model it decodes through, initialized from the imitator and fine-tuned with the controller, and Stage 2 is its input.
 
 <Wide n={1} title="The pipeline, stage by stage.">
   <PipelineExplorer client:visible />
@@ -47,11 +47,11 @@ The key property comes from the pretrained latent. The imitation model's intenti
 
 <h2 id="vocabularies">Three vocabularies, one controller</h2>
 
-We train the same controller design on three steering strategies (one training run each) that differ in where they come from and how large they are:
+Behavioral neuroscience already maintains many such vocabularies, built independently of any controller. We train the same controller design on three of them (one training run each) that differ in where they come from and how large they are:
 
 - **KPMS**: unsupervised Keypoint-MoSeq syllables, *K* = 100. Usage is heavy-tailed; the 25 most-used syllables cover about 97% of frames.
 - **KVAE**: latents of a kinematics VAE on short pose windows, clustered with *K*-means into *K* = 25 codes.
-- **MLB**: nine manually labeled behaviors, Walk, Rear and Turn crossed with Left, Straight and Right, plus Immobile. MLB is written by hand and never fit to the controller, so it tests whether the structure comes from the construction rather than a data-tuned front end.
+- **MLB**: nine manually labeled behaviors, Walk, Rear and Turn crossed with Left, Straight and Right, plus Immobile. MLB is written by hand rather than fit to the corpus, as a human annotation scheme would supply it. Because the three differ in origin, in size, and in whether they were fit to data at all, any property that holds for all three belongs to Code2Act rather than to a particular vocabulary.
 
 Below, each code is held constant on one body.
 
@@ -62,7 +62,7 @@ Below, each code is held constant on one body.
   </Fragment>
 </Wide>
 
-Executed on the body, not every symbol is distinguishable. The nine MLB symbols steer to about five distinct behaviors: there are only about 100 labeled Walk R frames in the corpus, and a rear is the same movement whether it is labeled left or right. Keypoint-MoSeq is more redundant still, with usage concentrated on about 7 of its 100 syllables. Running a vocabulary on a body measures how many of its symbols correspond to distinct behaviors, a check the labels alone cannot provide.
+Executed on the body, not every symbol is distinguishable. The nine MLB symbols steer to about five distinct behaviors: there are only about 100 labeled Walk R frames in the corpus, and a rear is the same movement whether it is labeled left or right. Keypoint-MoSeq concentrates its usage on about 7 of its 100 syllables, while the KVAE codebook stays near its full size (an effective 24 of 25 codes). The check therefore discriminates between vocabularies rather than always finding collapse: running a vocabulary on a body shows which of its symbols are distinct actions, which are redundant, and which distinctions the data cannot support.
 
 <h2 id="viewer">Steer it yourself</h2>
 
@@ -100,7 +100,7 @@ Checking individual symbols is only meaningful if the controller's motion looks 
 </table>
 </div>
 
-Every structured stream reaches a KID far below the random stream of the same strategy, with the original codes at or near the lowest and the learned priors close behind: realism tracks the temporal structure of the symbol stream. This is a property of the motion distribution, so we report it as a table rather than as a single clip.
+Every structured stream reaches a KID 1.8 to 4.5 times lower than the random stream of the same vocabulary, with the corpus sequences lowest for two of the three vocabularies and the learned priors close behind: realism tracks the temporal structure of the symbol stream, for all three vocabularies. This is a property of the motion distribution, so we report it as a table rather than as a single clip.
 
 <h2 id="dynamics">Inside the controller</h2>
 
@@ -127,20 +127,20 @@ The matrices summarize dynamics; the trajectories themselves are below. Each hel
 
 <h2 id="roundtrip">The same symbol, from anywhere</h2>
 
-A symbolic layer needs each symbol to mean the same behavior whenever it is issued, from whatever state the body is in. A symbol that merely replayed a stored trajectory would work from one start pose. Because each symbol is defined outside the controller, re-labeling the motion it produces scores the controller against a criterion it was never trained on. We hold each symbol from 60 start poses and let the strategy's own labeler read the motion back.
+A symbolic layer needs each symbol to mean the same behavior whenever it is issued, from whatever state the body is in. A symbol that merely replayed a stored trajectory would work from one start pose. Because each symbol is defined outside the controller, re-labeling the motion it produces scores the controller against a criterion it was never trained on. We hold each symbol from 60 start poses and let the vocabulary's own labeler read the motion back, a test we call *label recovery*.
 
-<Wide n={6} title="Round trip: command a symbol, read it back.">
+<Wide n={6} title="Label recovery: command a symbol, read it back.">
   <RoundTripExplorer client:visible base={base} clips={roundtrip} bars={roundtripBars} />
   <Fragment slot="caption">
-    Left: four of the 60 start poses for the selected MLB symbol (a seeded random draw), with the readout the round trip assigns to each. Right: each commanded symbol's readouts split into the symbol itself, the same behavior in another direction, and a different behavior; the most common wrong destination is printed for large error segments. Switch strategies to compare KPMS and KVAE, which are read back by their own tokenizers.
+    Left: four of the 60 start poses for the selected MLB symbol (a seeded random draw), with the readout label recovery assigns to each. Right: each commanded symbol's readouts split into the symbol itself, the same behavior in another direction, and a different behavior; the most common wrong destination is printed for large error segments. Switch vocabularies to compare KPMS and KVAE, which are read back by their own labelers.
   </Fragment>
 </Wide>
 
-For MLB the commanded symbol is recovered in 48% of instantiations and its behavior in 69%, against chance levels of 11% and 25%. Most of the shortfall is the directional collapse seen above: 8 of the 9 symbols place their most common readout inside the correct behavior. The exception, Turn L, reads as Walk L in 98% of instantiations, which makes it the most consistent symbol in the codebook, executed as a curving walk.
+For MLB the commanded behavior is recovered in 69% of instantiations and the exact symbol in 48%, against chance levels of 25% and 11%; KVAE reaches 83% and 80%, and KPMS 51% and 48%. Most of the shortfall is the directional collapse seen above: 8 of the 9 symbols place their most common readout inside the correct behavior. The exception, Turn L, reads as Walk L in 98% of instantiations, which makes it the most consistent symbol in the codebook, executed as a curving walk.
 
 <h2 id="perturbation">Kick it, and it comes back</h2>
 
-The round trip only varies the start pose. We also perturb the body during execution: after it settles under a held symbol, a single-step velocity impulse of scale *a* hits it, and the controller, still reading only the symbol, has to bring it back.
+Label recovery only varies the start pose. We also perturb the body during execution: after it settles under a held symbol, a single-step velocity impulse of scale *a* hits it, and the controller, still reading only the symbol, has to bring it back.
 
 <Wide n={7} title="Kick and recovery.">
   <KickViewer client:visible base={base} clips={kick} curves={{ mlb: perturbation.mlb }} />
@@ -149,7 +149,7 @@ The round trip only varies the start pose. We also perturb the body during execu
   </Fragment>
 </Wide>
 
-Five seconds after the impulse, 85% (MLB), 92% (KPMS) and 74% (KVAE) of the induced displacement has decayed on average, with little dependence on impulse size. Across a 6.7-fold range of impulse, MLB's peak displacement grows 7.9-fold but its final displacement only 2.0-fold. The deviation from unperturbed motion grows with the impulse yet stays below the distance between distinct symbols for every behavior at *a* = 0.6. For MLB, rears cross that line at *a* = 1.2 and turns at *a* = 4.0, while walks and immobility never do; a rear sits near the limit of static stability. Recovery is partial and posture-dependent, but it holds across every tested symbol and strategy.
+Five seconds after the impulse, 85% (MLB), 92% (KPMS) and 74% (KVAE) of the induced displacement has decayed on average, with little dependence on impulse size. Across a 6.7-fold range of impulse, MLB's peak displacement grows 7.9-fold but its final displacement only 2.0-fold. The deviation from unperturbed motion grows with the impulse yet stays below the distance between distinct symbols for every behavior at *a* = 0.6. For MLB, rears cross that line at *a* = 1.2 and turns at *a* = 4.0, while walks and immobility never do; a rear sits near the limit of static stability. Recovery is consistent across every tested symbol and vocabulary but depends on posture: rear, the posture nearest the limit of static stability, is the least stable.
 
 <h2 id="transitions">Transitions the corpus never contains</h2>
 
@@ -178,11 +178,9 @@ The resulting motion is less realistic than corpus-derived sequences but stays f
 
 <h2 id="discussion">Discussion</h2>
 
-Code2Act provides a symbolic layer that acts through physics: its symbols are simple to state, they drive the body, and they hold under perturbation. A practitioner with a segmentation, an ethogram or a set of annotated behaviors obtains an executor for all of it from a single training run, with no reward designed per behavior, no policy trained per symbol, and no controller written by hand. Swapping one vocabulary for another changes only the input stream, as we showed by training the same controller design on a Keypoint-MoSeq segmenter, a VAE codebook and a hand-written label set.
+Code2Act executes externally defined behavioral vocabularies on a biomechanical rat without the controller ever shaping the vocabulary. Across three vocabularies of different origin, commanded symbols produce realistic motion, keep recognizable behaviors across diverse initial states, recover from physical perturbation, and compose into sequences the data never contained. For neuro-symbolic embodied agents, this lets a higher-level reasoning system keep its own action vocabulary while its symbols are grounded in physical control. For neuroethology, it lets a behavioral vocabulary be evaluated by executing it rather than only describing it: execution reveals which symbols correspond to physically distinguishable behaviors, and different labeling methods can be compared on the same body.
 
-The resulting command space is finite, and the interface reports which of its symbols the body can actually realize as distinct behaviors. The retained symbols support counterfactuals: held, composed into unseen sequences, and checked directly on the body. For neuroethology, this offers a way to test a behavioral vocabulary by executing it. For symbolic control, it offers a motor layer that does not have to be built one behavior at a time.
-
-The main prerequisite, and limitation, is a pretrained imitation model for the body of interest, which the interface reuses rather than replaces.
+Several limitations remain. Code2Act needs a pretrained imitation model for the body of interest. Fine behavioral distinctions, such as direction, can be lost when the training data holds too few examples of them, so richer or more balanced data should improve symbol-level fidelity. Longer composed sequences may drive the body outside the training distribution and degrade control; integrating planners or language models with mechanisms that correct execution drift is a natural next step. Finally, symbol-level accuracy is measured with the same behavioral labelers that define and recover each vocabulary.
 
 <h2 id="citation">Citation</h2>
 

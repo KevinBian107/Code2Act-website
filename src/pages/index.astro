@@ -12,7 +12,7 @@ import { Content } from "../content.mdx";
 
 const title = "Discrete Actions for Naturalistic Behavior in Embodied Biomechanical Animal Models";
 const description =
-  "Code2Act turns any discrete behavioral vocabulary into motor commands for a 38-actuator biomechanical rat.";
+  "Code2Act executes any externally defined behavioral vocabulary on a biomechanical virtual rat by mapping each symbol into the latent space of a frozen, pretrained imitation model.";
 
 const authors = [
   { name: "Kaiwen Bian", aff: "1,2" },
@@ -45,7 +45,7 @@ const tocSections = [
   { id: "viewer", label: "Steer it yourself" },
   { id: "realism", label: "Realism" },
   { id: "dynamics", label: "Inside the controller" },
-  { id: "roundtrip", label: "Round trip" },
+  { id: "roundtrip", label: "Label recovery" },
   { id: "perturbation", label: "Perturbation" },
   { id: "transitions", label: "Unseen transitions" },
   { id: "discussion", label: "Discussion" },
@@ -129,19 +129,19 @@ const prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
           <div>
             <h2 class="mb-3 text-lg font-semibold text-zinc-100">Abstract</h2>
             <p class="text-justify text-[0.95rem] leading-relaxed text-zinc-300">
-              Embodied symbolic systems depend on a discrete vocabulary that compresses continuous motion into named
-              actions, which make planning and annotation tractable. Many such vocabularies exist, from unsupervised
-              segmentation to hand annotation, but they only describe motion, and making a body perform one of their symbols
-              requires a hand-engineered controller or a policy trained for that symbol. We present <b class="text-white"
-                >Code2Act</b
-              >, which turns any discrete vocabulary into motor commands for a 38-actuator biomechanical rat. One recurrent
-              controller reads only the symbol stream and proprioception, predicts the motor latent that a frozen pretrained
-              imitation model would supply, and decodes through that model's inverse-dynamics module. A single training run
-              then covers an entire vocabulary with no per-symbol reward and no per-symbol training. We drove one controller
-              from three vocabularies of different provenance and size. An independent labeler can recover each steering
-              symbol from the motion it produced, across arbitrary initial poses and external velocity impulses. Symbols are
-              executed by the body and realized as distinct motion, and novel combinations of symbol pairs can produce
-              within-distribution motion patterns.
+              Neuro-symbolic embodied agents need a layer that turns discrete symbols into physical action, and those
+              symbols should belong to the system that does the reasoning, whether a planner, a language model, or a human
+              annotation scheme. Physics-based imitation now produces realistic motion, and some controllers do so through a
+              discrete bottleneck. However, their codes are learned by the controller to reconstruct motion, so any system
+              issuing symbols to them must adopt the controller's vocabulary rather than use its own. Here, we present
+              <b class="text-white">Code2Act</b>, which executes any externally defined vocabulary on a biomechanical virtual
+              rat by mapping each symbol into the latent space of a frozen, pretrained imitation model. The vocabulary is
+              fixed before training and never shaped by the controller. Behavioral neuroscience supplies vocabularies of
+              different origin, and we use three of them with the same architecture: an unsupervised segmentation, a learned
+              latent codebook, and a hand-specified set of behaviors. Commanded symbols produce realistic motion, are
+              recognized as the commanded behavior from diverse starting states, recover from physical perturbation, and
+              combine into sequences never seen in the data. Executing a vocabulary also reveals how many of its symbols the
+              body realizes as distinct behaviors.
             </p>
           </div>
           <div>
