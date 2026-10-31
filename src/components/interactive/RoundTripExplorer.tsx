@@ -36,7 +36,7 @@ const SEG = ["#1b4965", "#7fa8c9", "#e2e2e2"];
 const NAMES: Record<string, string> = { mlb: "MLB", kpms: "KPMS", kvae: "KVAE" };
 const short = (s: string) => s.replace("Left", "L").replace("Right", "R").replace("Straight", "S");
 
-/** Hold a symbol from four start poses; read the motion back (Fig. 3a, 6). */
+/** Hold a symbol from four start poses; read the motion back (Fig. 2a, 6). */
 export default function RoundTripExplorer({ base, clips, bars }: Props) {
   const [sel, setSel] = useState(0);
   const [strategy, setStrategy] = useState("mlb");

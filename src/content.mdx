@@ -17,7 +17,6 @@ import pairs from "./data/pairs.json";
 import transitions from "./data/transitions.json";
 import dsaBody from "./assets/figures/dsa_body_mlb_sq.png";
 import dsaHidden from "./assets/figures/dsa_hidden_mlb_sq.png";
-import { MLB } from "./components/interactive/util";
 
 export const base = import.meta.env.BASE_URL;
 
@@ -25,7 +24,7 @@ export const base = import.meta.env.BASE_URL;
 
 Behavioral neuroscience and embodied AI both describe behavior with discrete vocabularies. Keypoint-MoSeq splits motion into syllables, pose classifiers assign discriminative classes, annotators write ethograms, and planners emit symbols. Over such a vocabulary, planning and annotation become tractable. But none of these symbols can be *executed*: they describe recorded motion, and making a body perform one usually takes a hand-engineered controller or a policy trained, with its own reward, for that symbol alone.
 
-**Code2Act** closes that gap for the 38-actuator biomechanical rat of [MIMIC-MJX](https://mimic-mjx.talmolab.org/). One recurrent controller reads only a stream of symbols and the body's proprioception, and turns it into torques. Because the symbol stream is its only command input, a single training run covers an entire vocabulary, and the vocabulary can be swapped for any other labeling without changing the controller's design.
+Controllers that do act through a discrete bottleneck learn their own codebook, optimized to reconstruct motion, so any planner, language model or annotation scheme that issues commands has to adopt the controller's vocabulary instead of its own. **Code2Act** inverts this for the 38-actuator biomechanical rat of [MIMIC-MJX](https://mimic-mjx.talmolab.org/). The vocabulary is defined outside the controller and fixed before training; the controller never shapes it. One recurrent controller reads only that symbol stream and the body's proprioception, maps each symbol into the latent space of a frozen, pretrained imitation model, and decodes it to torques. A single training run covers an entire vocabulary, and the vocabulary can be swapped for any other labeling without changing the controller's design.
 
 On this page we walk through what the controller does, with the rollouts behind the paper's figures rendered as video and several of the analyses made interactive.
 
@@ -105,20 +104,15 @@ Every structured stream reaches a KID far below the random stream of the same st
 
 <h2 id="dynamics">Inside the controller</h2>
 
-The body and the controller organize the same symbols differently. We compare per-symbol dynamics with dynamical similarity analysis (DSA), once on the body state and once on the GRU state. On the body, symbols separate cleanly: the three rears group with Immobile and the walks form their own block. Inside the controller the blocks blur, and the turns group with Walk R rather than with the other walks. This mirrors the data: in the corpus a turn is mostly a curving walk, and Walk R is the rarest symbol.
+The body and the controller organize the same symbols differently. We compare per-symbol dynamics with dynamical similarity analysis (DSA), once on the body state and once on the GRU state. On the body, symbols split into held postures and locomotion: the three rears group with Immobile, and the walks and turns form the other block. Inside the controller the split moves: Walk L and Walk S separate from everything else, and the turns group with Walk R rather than with the other walks. This mirrors the data: in the corpus a turn is mostly a curving walk, and Walk R is the rarest symbol.
 
 <Wide n={4} title="Symbol dynamics on the body and in the controller.">
   <div class="grid gap-4 sm:grid-cols-2">
     <div><Image src={dsaBody} alt="DSA distances between MLB symbols on the body state" class="w-full" /><div class="mt-1 text-center text-sm text-zinc-500">(a) body state</div></div>
     <div><Image src={dsaHidden} alt="DSA distances between MLB symbols on the GRU state" class="w-full" /><div class="mt-1 text-center text-sm text-zinc-500">(b) controller (GRU) state</div></div>
   </div>
-  <div class="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-zinc-600">
-    {MLB.map((m) => (
-      <span class="flex items-center gap-1.5"><span class="inline-block h-3 w-3 rounded-sm" style={{ background: `rgb(${m.color.map((c) => Math.round(c * 255)).join(",")})` }}></span>{m.name.replace("_", " ")}</span>
-    ))}
-  </div>
   <Fragment slot="caption">
-    Pairwise DSA angular distance between per-symbol operators (the paper's Fig. 2a,b), each matrix reordered by clustering its own distances and drawn on its own color scale; the axis strips give each symbol's category. Behavior labels play no part in the ordering.
+    Pairwise DSA angular distance between per-symbol operators (the paper's Fig. 3a,b), each matrix ordered by average-linkage clustering of its own distances (dendrogram above) and drawn on its own color scale. Outlined blocks are the clusters at the paper's fixed cut (dashed line). Behavior labels play no part in the ordering.
   </Fragment>
 </Wide>
 

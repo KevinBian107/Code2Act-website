@@ -98,7 +98,7 @@ function LineChart({
   );
 }
 
-/** Kick a body holding a symbol and watch it return (Fig. 3b,c, 7, 8). */
+/** Kick a body holding a symbol and watch it return (Fig. 2b,c, 7, 8). */
 export default function KickViewer({ base, clips, curves }: Props) {
   const [strategy, setStrategy] = useState("mlb");
   const [beh, setBeh] = useState("Rear");

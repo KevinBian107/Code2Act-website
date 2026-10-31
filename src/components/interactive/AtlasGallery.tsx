@@ -25,7 +25,7 @@ const TABS = [
 ];
 const ORDER = ["Walk", "Turn", "Rear", "Immobile"];
 
-/** Every code of a vocabulary, held constant on one body (Fig. 2c, 11, 12). */
+/** Every code of a vocabulary, held constant on one body (Fig. 3c, 11, 12). */
 export default function AtlasGallery({ data, base }: Props) {
   const [tab, setTab] = useState("mlb");
   const [open, setOpen] = useState<Item | null>(null);
